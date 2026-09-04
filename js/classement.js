@@ -26,7 +26,11 @@ const zoneListeEnLigne = document.getElementById("scoresListeEnLigne");
 const zoneEtatEnLigne = document.getElementById("scoresEtatEnLigne");
 
 function classementActif() {
-  return API_CLASSEMENT !== "" && typeof fetch === "function";
+  // Sans les elements d'affichage, on ne tente rien
+  return API_CLASSEMENT !== ""
+    && typeof fetch === "function"
+    && zoneEnLigne !== null
+    && zoneListeEnLigne !== null;
 }
 
 // Apps Script n'expose qu'une seule adresse, avec les parametres en clair
@@ -100,7 +104,9 @@ async function envoyerScore(id, nom, score) {
 // Chargement du classement d'un jeu. Appele a l'ouverture du tableau.
 async function afficherClassementEnLigne(id) {
   if (!classementActif()) {
-    zoneEnLigne.hidden = true;
+    if (zoneEnLigne !== null) {
+      zoneEnLigne.hidden = true;
+    }
     return;
   }
   zoneEnLigne.hidden = false;
@@ -116,7 +122,9 @@ async function afficherClassementEnLigne(id) {
 }
 
 function afficherEtatEnLigne(texte) {
-  zoneEtatEnLigne.textContent = texte;
+  if (zoneEtatEnLigne !== null) {
+    zoneEtatEnLigne.textContent = texte;
+  }
 }
 
 function remplirListeEnLigne(id, scores, aMettreEnAvant) {
@@ -153,10 +161,13 @@ function remplirListeEnLigne(id, scores, aMettreEnAvant) {
 
 const boutonSuggestion = document.getElementById("menuSuggestion");
 
-if (FORMULAIRE_SUGGESTIONS === "") {
-  boutonSuggestion.hidden = true;
-} else {
-  boutonSuggestion.addEventListener("click", function () {
-    window.open(FORMULAIRE_SUGGESTIONS, "_blank", "noopener");
-  });
+// Le bouton peut ne pas exister si index.html n'a pas ete mis a jour
+if (boutonSuggestion !== null) {
+  if (FORMULAIRE_SUGGESTIONS === "") {
+    boutonSuggestion.hidden = true;
+  } else {
+    boutonSuggestion.addEventListener("click", function () {
+      window.open(FORMULAIRE_SUGGESTIONS, "_blank", "noopener");
+    });
+  }
 }
