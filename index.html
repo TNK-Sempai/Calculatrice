@@ -72,12 +72,15 @@
 
 <!-- Zone de jeu plein ecran (cachee par defaut) -->
   <section class="jeu" id="jeu" hidden>
-    <div class="jeu-entete">
+    <div class="jeu-entete entete-snake">
       <span class="jeu-score">Score <strong id="score">0</strong></span>
+      <span class="jeu-score">Pommes <strong id="pommesSnake">0</strong></span>
       <button class="jeu-quitter" id="quitterJeu" type="button">Retour</button>
     </div>
+    <p class="jeu-message" id="messageSnake"></p>
     <canvas id="canvasSnake" width="600" height="600"></canvas>
-    <p class="jeu-aide">Fleches ou ZQSD pour bouger, Espace pour recommencer, Echap pour quitter</p>
+    <p class="effets-snake" id="effetsSnake"></p>
+    <p class="jeu-aide">Fleches ou ZQSD pour bouger. Attrape les pastilles vertes, evite les rouges. N : nouvelle partie. Echap : quitter</p>
   </section>
 
   <!-- Tetris plein ecran (cache par defaut) -->
@@ -199,6 +202,37 @@
     <p class="jeu-aide">Clique une case puis tape un chiffre. Fleches pour se deplacer, 0 ou Retour pour effacer, N pour le mode notes. Echap : quitter.</p>
   </section>
 
+  <!-- Space Invaders plein ecran (cache par defaut) -->
+  <section class="jeu jeu-invaders" id="jeuInvaders" hidden>
+    <div class="jeu-entete entete-invaders">
+      <span class="jeu-score">Score <strong id="scoreInvaders">0</strong></span>
+      <span class="jeu-score">Vies <strong id="viesInvaders">3</strong></span>
+      <span class="jeu-score">Vague <strong id="vagueInvaders">1</strong></span>
+      <button class="jeu-quitter" id="recommencerInvaders" type="button">Recommencer</button>
+      <button class="jeu-quitter" id="quitterInvaders" type="button">Retour</button>
+    </div>
+    <p class="jeu-message" id="messageInvaders"></p>
+    <canvas id="canvasInvaders" width="480" height="600"></canvas>
+    <p class="jeu-aide">Fleches, QD ou souris pour bouger. Espace ou clic pour tirer. N : recommencer. Echap : quitter.</p>
+  </section>
+
+  <!-- Mahjong solitaire plein ecran (cache par defaut) -->
+  <section class="jeu jeu-mahjong" id="jeuMahjong" hidden>
+    <div class="jeu-entete entete-mahjong">
+      <span class="jeu-score">Temps <strong id="chronoMahjong">0:00</strong></span>
+      <span class="jeu-score">Tuiles <strong id="restantesMahjong">144</strong></span>
+      <span class="jeu-score">Paires <strong id="pairesMahjong">0</strong></span>
+      <button class="jeu-quitter" id="indiceMahjong" type="button">Indice</button>
+      <button class="jeu-quitter" id="melangerMahjong" type="button">Melanger</button>
+      <button class="jeu-quitter" id="annulerMahjong" type="button">Annuler</button>
+      <button class="jeu-quitter" id="nouvelleMahjong" type="button">Nouvelle partie</button>
+      <button class="jeu-quitter" id="quitterMahjong" type="button">Retour</button>
+    </div>
+    <p class="jeu-message" id="messageMahjong"></p>
+    <div class="plateau-mahjong" id="plateauMahjong"></div>
+    <p class="jeu-aide">Clique deux tuiles identiques et libres. H : indice. M : melanger. Retour arriere : annuler. N : nouvelle partie. Echap : quitter.</p>
+  </section>
+
   <!-- Menu arcade (code 1337, ou appui long sur le titre) -->
   <div class="overlay menu-arcade" id="menuArcade" hidden>
     <h2 class="overlay-titre">Arcade</h2>
@@ -209,7 +243,17 @@
   <!-- Tableau des meilleurs scores -->
   <div class="overlay scores" id="scores" hidden>
     <h2 class="overlay-titre" id="scoresTitre">High scores</h2>
-    <ol class="scores-liste" id="scoresListe"></ol>
+    <div class="scores-colonnes">
+      <div class="scores-colonne">
+        <span class="tetris-label">Sur cet appareil</span>
+        <ol class="scores-liste" id="scoresListe"></ol>
+      </div>
+      <div class="scores-colonne" id="scoresEnLigne" hidden>
+        <span class="tetris-label">Classement en ligne</span>
+        <ol class="scores-liste" id="scoresListeEnLigne"></ol>
+        <p class="scores-etat" id="scoresEtatEnLigne"></p>
+      </div>
+    </div>
     <div class="scores-saisie" id="scoresSaisie" hidden>
       <span class="tetris-label">Nouveau record, entre tes initiales</span>
       <div class="scores-ligne">
@@ -224,6 +268,7 @@
   </div>
 
   <script src="js/arcade.js"></script>
+  <script src="js/classement.js"></script>
   <script src="js/calculatrice.js"></script>
   <script src="js/snake.js"></script>
   <script src="js/tetris.js"></script>
@@ -232,5 +277,7 @@
   <script src="js/blackjack.js"></script>
   <script src="js/casse-briques.js"></script>
   <script src="js/sudoku.js"></script>
+  <script src="js/invaders.js"></script>
+  <script src="js/mahjong.js"></script>
 </body>
 </html>

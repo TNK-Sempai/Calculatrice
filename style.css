@@ -286,6 +286,30 @@ body::before {
   max-width: 90vw;
 }
 
+/* ===== Snake ===== */
+.entete-snake {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.jeu-snake .jeu-message,
+#messageSnake {
+  font-family: var(--police-affichage);
+  font-size: 1.3rem;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  min-height: 1.4em;
+  text-align: center;
+}
+
+.effets-snake {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: var(--texte-sourd);
+  min-height: 1.2em;
+  text-align: center;
+}
+
 /* Tetris : plateau 1:2 avec panneaux hold et next */
 .jeu-tetris {
   --hauteur-plateau: min(calc(100vh - 140px), calc((100vw - 80px) * 10 / 9));
@@ -487,6 +511,143 @@ body::before {
   min-height: 1.4em;
 }
 
+/* ===== Mahjong solitaire ===== */
+.jeu-mahjong {
+  gap: 10px;
+}
+
+.entete-mahjong {
+  width: min(96vw, 1000px);
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+/* Le plateau fait 16 tuiles de large et 8 de haut, plus le relief */
+.plateau-mahjong {
+  --largeur-tuile: min(calc(96vw / 17), calc((100vh - 200px) / 9.5));
+  --hauteur-tuile: calc(var(--largeur-tuile) * 1.32);
+  --relief: calc(var(--largeur-tuile) * 0.11);
+  position: relative;
+  width: calc(var(--largeur-tuile) * 16.5);
+  height: calc(var(--hauteur-tuile) * 8.6);
+  margin-left: calc(var(--largeur-tuile) * 1);
+}
+
+.tuile-mahjong {
+  position: absolute;
+  width: var(--largeur-tuile);
+  height: var(--hauteur-tuile);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-family: var(--police-mono);
+  font-size: calc(var(--largeur-tuile) * 0.42);
+  line-height: 1;
+  color: #2a2a2a;
+  background: linear-gradient(150deg, #f4f2ea 0%, #ddd9cc 100%);
+  border: 1px solid #b8b3a4;
+  border-radius: calc(var(--largeur-tuile) * 0.12);
+  box-shadow:
+    calc(var(--relief) * -0.5) calc(var(--relief) * 0.5) 0 #a8a293,
+    2px 3px 6px rgba(0, 0, 0, 0.45);
+  cursor: default;
+  filter: brightness(0.62) saturate(0.7);
+  transition: filter 0.12s, transform 0.08s;
+}
+
+/* Une tuile jouable ressort du tas */
+.tuile-mahjong.libre {
+  filter: none;
+  cursor: pointer;
+}
+
+.tuile-mahjong.libre:hover {
+  transform: translateY(-2px);
+}
+
+.tuile-mahjong.choisie {
+  background: linear-gradient(150deg, #eaffb0 0%, var(--accent) 100%);
+  border-color: var(--accent-sombre);
+  transform: translateY(-3px);
+}
+
+.tuile-mahjong.indiquee {
+  border-color: var(--accent);
+  box-shadow:
+    calc(var(--relief) * -0.5) calc(var(--relief) * 0.5) 0 #a8a293,
+    0 0 0 2px var(--accent),
+    2px 3px 6px rgba(0, 0, 0, 0.45);
+}
+
+/* Couleurs des familles, comme sur de vraies tuiles */
+.famille-cercle,
+.famille-caractere {
+  color: #1f3f8a;
+}
+
+.famille-bambou,
+.famille-dragon-vert {
+  color: #1f6b34;
+}
+
+.famille-dragon-rouge {
+  color: #b52a20;
+}
+
+.famille-vent,
+.famille-dragon-blanc {
+  color: #2a2a2a;
+}
+
+.famille-fleur {
+  color: #b52a20;
+}
+
+.famille-saison {
+  color: #9a6b12;
+}
+
+.jeu-mahjong .jeu-message {
+  font-size: 1.1rem;
+  min-height: 1.4em;
+}
+
+@media (max-width: 640px) {
+  .tuile-mahjong {
+    font-size: calc(var(--largeur-tuile) * 0.5);
+  }
+}
+
+/* ===== Space Invaders ===== */
+.jeu-invaders {
+  gap: 10px;
+}
+
+.entete-invaders {
+  width: min(94vw, calc((100vh - 190px) * 0.8));
+  max-width: 520px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+#canvasInvaders {
+  height: min(calc(100vh - 190px), calc(94vw * 5 / 4));
+  width: auto;
+  max-width: 94vw;
+  background-color: var(--fond);
+  border: 1px solid var(--bord);
+  border-radius: 8px;
+  touch-action: none;
+  cursor: none;
+}
+
+.jeu-invaders .jeu-message {
+  font-size: 1.1rem;
+  min-height: 1.4em;
+}
+
 /* ===== Sudoku ===== */
 .jeu-sudoku {
   --cote-sudoku: min(92vw, calc(100vh - 300px), 520px);
@@ -548,9 +709,28 @@ body::before {
   box-shadow: 2px 0 0 var(--accent-sombre), 0 2px 0 var(--accent-sombre);
 }
 
+/* Chiffres imposes par la grille : blancs et sur fond plus clair */
 .case-sudoku.imposee {
   color: var(--texte);
   background-color: var(--panneau-clair);
+}
+
+/* Chiffres saisis par le joueur : lime */
+.case-sudoku.saisie {
+  color: var(--accent);
+}
+
+/* Doublon dans la ligne, la colonne ou le bloc */
+.case-sudoku.conflit {
+  color: #ff5f56;
+}
+
+.case-sudoku.conflit::after {
+  content: "";
+  position: absolute;
+  inset: auto 22% 8% 22%;
+  height: 2px;
+  background-color: #ff5f56;
 }
 
 .case-sudoku.liee {
@@ -568,8 +748,17 @@ body::before {
   z-index: 2;
 }
 
+/* Faute revelee par le bouton Verifier */
 .case-sudoku.erreur {
-  color: #ff5f56;
+  color: #ff9d3c;
+}
+
+.case-sudoku.erreur::after {
+  content: "";
+  position: absolute;
+  inset: auto 22% 8% 22%;
+  height: 2px;
+  background-color: #ff9d3c;
 }
 
 /* Candidats en petit dans la case */
@@ -988,6 +1177,29 @@ body::before {
   font-size: 0.7rem;
   letter-spacing: 0.08em;
   color: var(--texte-sourd);
+}
+
+/* Deux colonnes de scores : local et en ligne */
+.scores-colonnes {
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.scores-colonne {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.scores-etat {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--texte-sourd);
+  min-height: 1.2em;
 }
 
 /* Tableau des scores */

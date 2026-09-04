@@ -39,6 +39,7 @@ let modeNotes = false;
 let secondesSudoku = 0;
 let penalites = 0;
 let sudokuTermine = true;
+let erreursAffichees = false;   // reste vrai jusqu'a la prochaine saisie
 let chronoSudoku = null;
 let cellulesSudoku = [];
 
@@ -351,6 +352,7 @@ function saisirChiffre(chiffre) {
     nettoyerNotes(ligne, colonne, chiffre);
   }
 
+  erreursAffichees = false;
   dessinerSudoku();
   sauverSudoku();
 
@@ -373,6 +375,34 @@ function nettoyerNotes(ligne, colonne, chiffre) {
   }
 }
 
+// Un chiffre en double dans sa ligne, sa colonne ou son bloc.
+// C'est une infraction aux regles, pas une comparaison avec la solution,
+// donc cela ne devoile jamais la reponse.
+function enConflit(ligne, colonne) {
+  const valeur = grilleJoueur[ligne][colonne];
+  if (valeur === 0) {
+    return false;
+  }
+  for (let i = 0; i < 9; i++) {
+    if (i !== colonne && grilleJoueur[ligne][i] === valeur) {
+      return true;
+    }
+    if (i !== ligne && grilleJoueur[i][colonne] === valeur) {
+      return true;
+    }
+  }
+  const debutLigne = ligne - ligne % 3;
+  const debutColonne = colonne - colonne % 3;
+  for (let y = debutLigne; y < debutLigne + 3; y++) {
+    for (let x = debutColonne; x < debutColonne + 3; x++) {
+      if ((y !== ligne || x !== colonne) && grilleJoueur[y][x] === valeur) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 function verifierSudoku() {
   if (sudokuTermine) {
     return;
@@ -387,8 +417,9 @@ function verifierSudoku() {
     }
   }
   penalites += PENALITE_VERIFICATION;
+  erreursAffichees = true;
   majChronoSudoku();
-  dessinerSudoku(true);
+  dessinerSudoku();
   afficherMessageSudoku(fautes === 0
     ? "Aucune erreur, plus " + PENALITE_VERIFICATION + " s"
     : fautes + (fautes > 1 ? " erreurs" : " erreur") + ", plus " + PENALITE_VERIFICATION + " s");
@@ -450,7 +481,7 @@ function memeBloc(a, b) {
     && Math.floor(a.colonne / 3) === Math.floor(b.colonne / 3);
 }
 
-function dessinerSudoku(montrerErreurs) {
+function dessinerSudoku() {
   const valeurActive = caseSelectionnee === null
     ? 0
     : grilleJoueur[caseSelectionnee.ligne][caseSelectionnee.colonne];
@@ -461,15 +492,17 @@ function dessinerSudoku(montrerErreurs) {
       const valeur = grilleJoueur[ligne][colonne];
       const imposee = grilleDepart[ligne][colonne] !== 0;
 
-      cellule.classList.remove("imposee", "selectionnee", "liee", "identique", "erreur", "notes");
+      cellule.classList.remove("imposee", "saisie", "selectionnee", "liee", "identique", "conflit", "erreur", "notes");
       cellule.innerHTML = "";
 
       if (valeur !== 0) {
         cellule.textContent = String(valeur);
-        if (imposee) {
-          cellule.classList.add("imposee");
-        }
-        if (montrerErreurs && valeur !== solutionSudoku[ligne][colonne]) {
+        cellule.classList.add(imposee ? "imposee" : "saisie");
+
+        // Doublon visible immediatement, faute reelle seulement apres verification
+        if (!imposee && enConflit(ligne, colonne)) {
+          cellule.classList.add("conflit");
+        } else if (erreursAffichees && !imposee && valeur !== solutionSudoku[ligne][colonne]) {
           cellule.classList.add("erreur");
         }
         if (valeur === valeurActive && valeurActive !== 0) {
