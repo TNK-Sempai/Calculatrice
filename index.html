@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tanuki Calc</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <main class="calculatrice" id="calculatrice">
+
+    <!-- En-tete -->
+    <header class="entete">
+      <h1 class="titre" id="titreCalculatrice">Tanuki<span class="titre-creux">Calc</span></h1>
+      <button class="bascule-angle" id="basculeAngle" type="button" aria-label="Unite d'angle">DEG</button>
+    </header>
+
+    <!-- Ecran -->
+    <section class="ecran" aria-live="polite">
+      <div class="expression" id="expression">0</div>
+      <div class="apercu" id="apercu"></div>
+    </section>
+
+    <!-- Clavier scientifique -->
+    <section class="clavier" id="clavier">
+      <button class="bouton fonction" data-jeton="sin">sin</button>
+      <button class="bouton fonction" data-jeton="cos">cos</button>
+      <button class="bouton fonction" data-jeton="tan">tan</button>
+      <button class="bouton fonction" data-jeton="(">(</button>
+      <button class="bouton fonction" data-jeton=")">)</button>
+
+      <button class="bouton fonction" data-jeton="ln">ln</button>
+      <button class="bouton fonction" data-jeton="log">log</button>
+      <button class="bouton fonction" data-jeton="sqrt">&radic;</button>
+      <button class="bouton fonction" data-jeton="carre">x&sup2;</button>
+      <button class="bouton fonction" data-jeton="^">x<sup>y</sup></button>
+
+      <button class="bouton fonction" data-jeton="pi">&pi;</button>
+      <button class="bouton fonction" data-jeton="e">e</button>
+      <button class="bouton fonction" data-jeton="%">%</button>
+      <button class="bouton controle" data-action="retour">&#9003;</button>
+      <button class="bouton controle" data-action="effacer">C</button>
+
+      <button class="bouton chiffre" data-jeton="7">7</button>
+      <button class="bouton chiffre" data-jeton="8">8</button>
+      <button class="bouton chiffre" data-jeton="9">9</button>
+      <button class="bouton operateur" data-jeton="/">&divide;</button>
+      <button class="bouton operateur" data-jeton="*">&times;</button>
+
+      <button class="bouton chiffre" data-jeton="4">4</button>
+      <button class="bouton chiffre" data-jeton="5">5</button>
+      <button class="bouton chiffre" data-jeton="6">6</button>
+      <button class="bouton operateur" data-jeton="-">&minus;</button>
+      <button class="bouton operateur" data-jeton="+">+</button>
+
+      <button class="bouton chiffre" data-jeton="1">1</button>
+      <button class="bouton chiffre" data-jeton="2">2</button>
+      <button class="bouton chiffre" data-jeton="3">3</button>
+      <button class="bouton fonction" data-action="signe">&plusmn;</button>
+      <button class="bouton egal" data-action="egal">=</button>
+
+      <button class="bouton chiffre zero" data-jeton="0">0</button>
+      <button class="bouton chiffre" data-jeton=".">.</button>
+      <button class="bouton fonction" data-jeton="ans">ans</button>
+    </section>
+
+
+  </main>
+
+<!-- Zone de jeu plein ecran (cachee par defaut) -->
+  <section class="jeu" id="jeu" hidden>
+    <div class="jeu-entete">
+      <span class="jeu-score">Score <strong id="score">0</strong></span>
+      <button class="jeu-quitter" id="quitterJeu" type="button">Retour</button>
+    </div>
+    <canvas id="canvasSnake" width="600" height="600"></canvas>
+    <p class="jeu-aide">Fleches ou ZQSD pour bouger, Espace pour recommencer, Echap pour quitter</p>
+  </section>
+
+  <!-- Tetris plein ecran (cache par defaut) -->
+  <section class="jeu jeu-tetris" id="jeuTetris" hidden>
+    <div class="tetris-zone">
+      <aside class="tetris-cote">
+        <div class="tetris-panneau">
+          <span class="tetris-label">Hold</span>
+          <canvas id="canvasHold" width="120" height="120"></canvas>
+        </div>
+        <div class="tetris-stats">
+          <span class="tetris-label">Score</span>
+          <strong id="scoreTetris">0</strong>
+          <span class="tetris-label">Lignes</span>
+          <strong id="lignesTetris">0</strong>
+          <span class="tetris-label">Niveau</span>
+          <strong id="niveauTetris">1</strong>
+        </div>
+      </aside>
+      <canvas id="canvasTetris" width="300" height="600"></canvas>
+      <aside class="tetris-cote">
+        <div class="tetris-panneau">
+          <span class="tetris-label">Next</span>
+          <canvas id="canvasNext" width="120" height="420"></canvas>
+        </div>
+        <div class="tetris-message" id="messageTetris"></div>
+        <button class="jeu-quitter" id="quitterTetris" type="button">Retour</button>
+      </aside>
+    </div>
+    <p class="jeu-aide">Fleches ou QSD : bouger et descendre. Haut ou Z : tourner. X ou Ctrl : tourner dans l'autre sens. Shift ou C : hold. Espace : chute. P : pause. M : son. Echap : quitter.</p>
+  </section>
+
+  <!-- 2048 plein ecran (cache par defaut) -->
+  <section class="jeu jeu-2048" id="jeu2048" hidden>
+    <div class="jeu-entete entete-2048">
+      <span class="jeu-score">Score <strong id="score2048">0</strong></span>
+      <span class="jeu-score">Record <strong id="meilleur2048">0</strong></span>
+      <button class="jeu-quitter" id="nouvelle2048" type="button">Nouvelle partie</button>
+      <button class="jeu-quitter" id="quitter2048" type="button">Retour</button>
+    </div>
+    <div class="grille-2048" id="grille2048"></div>
+    <p class="jeu-aide">Fleches ou ZQSD pour glisser les tuiles. Sur mobile, glisse le doigt. N : nouvelle partie. Echap : quitter.</p>
+  </section>
+
+  <!-- Solitaire a billes plein ecran (cache par defaut) -->
+  <section class="jeu jeu-solitaire" id="jeuSolitaire" hidden>
+    <div class="jeu-entete entete-solitaire">
+      <span class="jeu-score">Billes <strong id="billesSolitaire">32</strong></span>
+      <span class="jeu-score">Coups <strong id="coupsSolitaire">0</strong></span>
+      <button class="jeu-quitter" id="annulerSolitaire" type="button">Annuler</button>
+      <button class="jeu-quitter" id="nouvelleSolitaire" type="button">Nouvelle partie</button>
+      <button class="jeu-quitter" id="quitterSolitaire" type="button">Retour</button>
+    </div>
+    <div class="plateau-solitaire" id="plateauSolitaire"></div>
+    <p class="jeu-message" id="messageSolitaire"></p>
+    <p class="jeu-aide">Clique une bille puis un trou vert pour sauter. Retour arriere ou Annuler pour revenir en arriere. N : nouvelle partie. Echap : quitter.</p>
+  </section>
+
+  <!-- Blackjack plein ecran (cache par defaut) -->
+  <section class="jeu jeu-blackjack" id="jeuBlackjack" hidden>
+    <div class="jeu-entete entete-blackjack">
+      <span class="jeu-score">Jetons <strong id="jetonsBlackjack">500</strong></span>
+      <span class="jeu-score">Pic <strong id="picBlackjack">500</strong></span>
+      <span class="jeu-score">Sabot <strong id="sabotBlackjack">312</strong></span>
+      <button class="jeu-quitter" id="encaisserBlackjack" type="button">Encaisser</button>
+      <button class="jeu-quitter" id="quitterBlackjack" type="button">Retour</button>
+    </div>
+
+    <div class="tapis">
+      <div class="cote-croupier">
+        <span class="tetris-label">Croupier <strong id="totalCroupier"></strong></span>
+        <div class="cartes" id="mainCroupier"></div>
+      </div>
+      <p class="jeu-message" id="messageBlackjack">Choisis ta mise</p>
+      <div class="cote-joueur">
+        <div class="mains-joueur" id="mainsJoueur"></div>
+      </div>
+    </div>
+
+    <div class="scores-ligne" id="misesBlackjack"></div>
+    <div class="scores-ligne" id="actionsBlackjack" hidden>
+      <button class="jeu-quitter" id="tirerBlackjack" type="button">Tirer</button>
+      <button class="jeu-quitter" id="resterBlackjack" type="button">Rester</button>
+      <button class="jeu-quitter" id="doublerBlackjack" type="button">Doubler</button>
+      <button class="jeu-quitter" id="separerBlackjack" type="button">Separer</button>
+    </div>
+
+    <p class="jeu-aide">1 a 4 pour miser, T tirer, R rester, D doubler, S separer, Espace pour le coup suivant. Echap : quitter.</p>
+  </section>
+
+  <!-- Casse-briques plein ecran (cache par defaut) -->
+  <section class="jeu jeu-briques" id="jeuCasseBriques" hidden>
+    <div class="jeu-entete entete-briques">
+      <span class="jeu-score">Niveau <strong id="niveauBriques">1</strong></span>
+      <span class="jeu-score">Score <strong id="scoreBriques">0</strong></span>
+      <span class="jeu-score">Vies <strong id="viesBriques">3</strong></span>
+      <button class="jeu-quitter" id="recommencerBriques" type="button">Recommencer</button>
+      <button class="jeu-quitter" id="quitterBriques" type="button">Retour</button>
+    </div>
+    <p class="jeu-message" id="messageBriques"></p>
+    <canvas id="canvasBriques" width="480" height="640"></canvas>
+    <p class="jeu-aide">Fleches, QD ou souris pour bouger. Espace ou clic pour lancer. N : recommencer. Echap : quitter.</p>
+  </section>
+
+  <!-- Sudoku plein ecran (cache par defaut) -->
+  <section class="jeu jeu-sudoku" id="jeuSudoku" hidden>
+    <div class="jeu-entete entete-sudoku">
+      <span class="jeu-score">Temps <strong id="chronoSudoku">0:00</strong></span>
+      <span class="jeu-score">Restantes <strong id="restantesSudoku">0</strong></span>
+      <button class="jeu-quitter" id="notesSudoku" type="button">Notes</button>
+      <button class="jeu-quitter" id="verifierSudoku" type="button">Verifier</button>
+      <button class="jeu-quitter" id="nouvelleSudoku" type="button">Nouvelle grille</button>
+      <button class="jeu-quitter" id="quitterSudoku" type="button">Retour</button>
+    </div>
+    <div class="scores-ligne" id="difficultesSudoku"></div>
+    <div class="grille-sudoku" id="grilleSudoku"></div>
+    <p class="jeu-message" id="messageSudoku"></p>
+    <div class="pave-sudoku" id="paveSudoku"></div>
+    <p class="jeu-aide">Clique une case puis tape un chiffre. Fleches pour se deplacer, 0 ou Retour pour effacer, N pour le mode notes. Echap : quitter.</p>
+  </section>
+
+  <!-- Menu arcade (code 1337, ou appui long sur le titre) -->
+  <div class="overlay menu-arcade" id="menuArcade" hidden>
+    <h2 class="overlay-titre">Arcade</h2>
+    <ul class="menu-liste" id="menuListe"></ul>
+    <button class="jeu-quitter" id="menuFermer" type="button">Fermer</button>
+  </div>
+
+  <!-- Tableau des meilleurs scores -->
+  <div class="overlay scores" id="scores" hidden>
+    <h2 class="overlay-titre" id="scoresTitre">High scores</h2>
+    <ol class="scores-liste" id="scoresListe"></ol>
+    <div class="scores-saisie" id="scoresSaisie" hidden>
+      <span class="tetris-label">Nouveau record, entre tes initiales</span>
+      <div class="scores-ligne">
+        <input class="scores-input" id="scoresNom" maxlength="3" autocomplete="off" spellcheck="false">
+        <button class="jeu-quitter" id="scoresValider" type="button">OK</button>
+      </div>
+    </div>
+    <div class="scores-ligne">
+      <button class="jeu-quitter" id="scoresRejouer" type="button">Rejouer</button>
+      <button class="jeu-quitter" id="scoresQuitter" type="button">Quitter</button>
+    </div>
+  </div>
+
+  <script src="js/arcade.js"></script>
+  <script src="js/calculatrice.js"></script>
+  <script src="js/snake.js"></script>
+  <script src="js/tetris.js"></script>
+  <script src="js/jeu-2048.js"></script>
+  <script src="js/solitaire.js"></script>
+  <script src="js/blackjack.js"></script>
+  <script src="js/casse-briques.js"></script>
+  <script src="js/sudoku.js"></script>
+</body>
+</html>
