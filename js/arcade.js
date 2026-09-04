@@ -251,6 +251,11 @@ function afficherTableau(id, entreeRecente, titre) {
   zoneScoresTitre.textContent = (titre || (jeu ? jeu.nom : "Arcade")) + " - high scores";
   zoneScoresListe.innerHTML = "";
 
+  // Le tableau partage se remplit de son cote, sans bloquer l'affichage
+  if (typeof afficherClassementEnLigne === "function" && !entreeRecente) {
+    afficherClassementEnLigne(id);
+  }
+
   if (tableau.length === 0) {
     const vide = document.createElement("li");
     vide.textContent = "Aucun score pour l'instant";
@@ -302,7 +307,12 @@ function validerNom() {
     return;
   }
   const saisie = champNom.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 3);
-  const entree = enregistrerScore(jeuAuScore, saisie || "AAA", scoreEnAttente);
+  const nom = saisie || "AAA";
+  const entree = enregistrerScore(jeuAuScore, nom, scoreEnAttente);
+  // Envoi au classement partage, s'il est configure
+  if (typeof envoyerScore === "function") {
+    envoyerScore(jeuAuScore, nom, scoreEnAttente);
+  }
   saisieScoreOuverte = false;
   zoneScoresSaisie.hidden = true;
   afficherTableau(jeuAuScore, entree, titreAuScore);
