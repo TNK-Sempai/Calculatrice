@@ -500,10 +500,10 @@ function dessinerTetris() {
   const largeur = canvasTetris.width;
   const hauteur = canvasTetris.height;
 
-  contexte.fillStyle = "#0e0e0e";
+  contexte.fillStyle = "#141414";
   contexte.fillRect(0, 0, largeur, hauteur);
 
-  contexte.strokeStyle = "#1a1a1a";
+  contexte.strokeStyle = "#242424";
   contexte.lineWidth = 1;
   for (let i = 1; i < COLONNES; i++) {
     contexte.beginPath();

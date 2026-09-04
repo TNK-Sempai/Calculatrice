@@ -10,7 +10,7 @@
 //                "https://serveur-de-l-ecole/tanuki/api"
 //   Apps Script : l'URL de deploiement qui finit par /exec
 //                "https://script.google.com/macros/s/AKfy.../exec"
-const API_CLASSEMENT = "https://script.google.com/macros/s/AKfycbweoj6RUlFITisocCRYHNVxJulRydNA-08t89FAObuqJV5wzeewT33wAhpvzN1z7kL9/exec";
+const API_CLASSEMENT = "https://script.google.com/macros/s/AKfycbwPzEKYsPyfv_X-0wVNMHRNXqPfSntE6G10ooctO5Yt4sd8pk2I3eRkhBqWFVqrec1l/exec";
 
 // "php" ou "apps-script". Les deux parlent le meme langage, seules
 // l'adresse des routes et l'en-tete d'envoi changent.
@@ -88,16 +88,51 @@ async function envoyerScore(id, nom, score) {
   if (!classementActif()) {
     return;
   }
+  const corps = JSON.stringify({ jeu: id, nom, score, marqueur: marqueurVisiteur() });
+  const enTetes = { "Content-Type": typeDeContenu() };
+
   const reponse = await appelerApi(adresseEnvoi(), {
     method: "POST",
-    headers: { "Content-Type": typeDeContenu() },
-    body: JSON.stringify({ jeu: id, nom, score, marqueur: marqueurVisiteur() })
+    headers: enTetes,
+    body: corps
   });
 
+  // Cas ideal : le serveur renvoie le classement mis a jour
   if (reponse !== null && Array.isArray(reponse.scores)) {
     remplirListeEnLigne(id, reponse.scores, { nom, score });
+    return;
+  }
+
+  // Le serveur a peut-etre enregistre sans que sa reponse soit lisible.
+  // Apps Script redirige les POST, et la redirection n'expose pas toujours
+  // les en-tetes qui autorisent la lecture entre domaines.
+  if (reponse === null) {
+    await envoiSansLecture(corps, enTetes);
+  }
+
+  // Dans tous les cas, on relit le classement : la lecture, elle, passe.
+  afficherEtatEnLigne("Mise a jour du classement...");
+  const relecture = await appelerApi(adresseLecture(id));
+
+  if (relecture !== null && Array.isArray(relecture.scores)) {
+    remplirListeEnLigne(id, relecture.scores, { nom, score });
   } else {
     afficherEtatEnLigne("Classement en ligne indisponible");
+  }
+}
+
+// Dernier recours : on envoie sans chercher a lire la reponse.
+// La requete part bien, seul le retour est opaque.
+async function envoiSansLecture(corps, enTetes) {
+  try {
+    await fetch(adresseEnvoi(), {
+      method: "POST",
+      mode: "no-cors",
+      headers: enTetes,
+      body: corps
+    });
+  } catch (erreur) {
+    // rien de plus a tenter
   }
 }
 

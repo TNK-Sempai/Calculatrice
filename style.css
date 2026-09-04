@@ -269,12 +269,20 @@ body::before {
   border-color: var(--accent);
 }
 
+/* Un lien stylise comme un bouton */
+.lien-bouton {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  line-height: 1;
+}
+
 #canvasSnake {
   width: min(90vw, calc(100vh - 160px));
   height: auto;
   aspect-ratio: 1;
   background-color: var(--fond);
-  border: 1px solid var(--bord);
+  border: 1px solid #3a4a22;
   border-radius: 6px;
   touch-action: none;
 }
@@ -326,7 +334,7 @@ body::before {
   height: var(--hauteur-plateau);
   width: calc(var(--hauteur-plateau) / 2);
   background-color: var(--fond);
-  border: 1px solid var(--bord);
+  border: 1px solid #3a4a22;
   border-radius: 6px;
   touch-action: none;
 }
@@ -637,7 +645,7 @@ body::before {
   width: auto;
   max-width: 94vw;
   background-color: var(--fond);
-  border: 1px solid var(--bord);
+  border: 1px solid #3a4a22;
   border-radius: 8px;
   touch-action: none;
   cursor: none;
@@ -835,7 +843,7 @@ body::before {
   width: auto;
   max-width: 94vw;
   background-color: var(--fond);
-  border: 1px solid var(--bord);
+  border: 1px solid #3a4a22;
   border-radius: 8px;
   touch-action: none;
   cursor: none;
@@ -1119,9 +1127,23 @@ body::before {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  /* Pas de justify-content : les marges automatiques ci-dessous centrent
+     le contenu quand il tient, et le laissent defiler quand il deborde.
+     Un justify-content: center couperait le haut de la liste. */
+  justify-content: flex-start;
   gap: 18px;
   padding: 24px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.overlay > *:first-child {
+  margin-top: auto;
+}
+
+.overlay > *:last-child {
+  margin-bottom: auto;
 }
 
 .overlay[hidden] {
@@ -1205,7 +1227,7 @@ body::before {
 /* Tableau des scores */
 .scores-liste {
   list-style: none;
-  width: min(340px, 90vw);
+  width: min(380px, 90vw);
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -1232,7 +1254,10 @@ body::before {
 
 .scores-nom {
   flex: 1;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.12em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .scores-saisie {
@@ -1246,14 +1271,16 @@ body::before {
   display: flex;
   gap: 8px;
   align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .scores-input {
-  width: 5em;
+  width: 8em;
   font-family: var(--police-affichage);
   font-size: 1.8rem;
   text-align: center;
-  letter-spacing: 0.3em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--accent);
   background-color: var(--panneau);
@@ -1270,6 +1297,38 @@ body::before {
 .titre {
   cursor: pointer;
   user-select: none;
+}
+
+/* Menu et scores sur petit ecran : tout doit rester atteignable */
+@media (max-width: 560px), (max-height: 720px) {
+  .overlay {
+    gap: 12px;
+    padding: 16px 12px;
+  }
+
+  .overlay-titre {
+    font-size: 1.8rem;
+  }
+
+  .menu-liste {
+    gap: 6px;
+  }
+
+  .menu-jeu {
+    padding: 7px 12px;
+  }
+
+  .menu-nom {
+    font-size: 1.15rem;
+  }
+
+  .menu-details {
+    font-size: 0.62rem;
+  }
+
+  .scores-colonnes {
+    gap: 16px;
+  }
 }
 
 /* ===== Petits ecrans ===== */

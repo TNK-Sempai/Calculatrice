@@ -511,7 +511,7 @@ function dessinerSprite(contexte, sprite, x, y, taille) {
 
 function dessinerInvaders() {
   const contexte = canvasInvaders.getContext("2d");
-  contexte.fillStyle = "#0e0e0e";
+  contexte.fillStyle = "#141414";
   contexte.fillRect(0, 0, LARGEUR_INVADERS, HAUTEUR_INVADERS);
 
   // Envahisseurs
@@ -646,4 +646,3 @@ enregistrerJeu({
   demarrer: demarrerInvaders,
   arreter: () => cancelAnimationFrame(boucleInvaders)
 });
-

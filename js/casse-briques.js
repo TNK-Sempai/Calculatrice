@@ -485,7 +485,7 @@ function boucleCasseBriques(maintenant) {
 
 function dessinerCasseBriques() {
   const contexte = canvasBriques.getContext("2d");
-  contexte.fillStyle = "#0e0e0e";
+  contexte.fillStyle = "#141414";
   contexte.fillRect(0, 0, LARGEUR_JEU, HAUTEUR_JEU);
 
   // Briques

@@ -27,6 +27,7 @@ let overlayOuvert = false;  // vrai quand le menu ou le tableau des scores est o
 const CODE_MENU = "1337";
 const CLE_SCORES = "tanuki-arcade-scores";
 const TAILLE_TABLEAU = 10;
+const LONGUEUR_PSEUDO = 9;
 
 // ---------------------------------------------------------------------
 // Registre des jeux
@@ -306,7 +307,7 @@ function validerNom() {
   if (!saisieScoreOuverte) {
     return;
   }
-  const saisie = champNom.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 3);
+  const saisie = champNom.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, LONGUEUR_PSEUDO);
   const nom = saisie || "AAA";
   const entree = enregistrerScore(jeuAuScore, nom, scoreEnAttente);
   // Envoi au classement partage, s'il est configure

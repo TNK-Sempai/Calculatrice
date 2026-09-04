@@ -285,10 +285,11 @@ function dessiner() {
   const contexte = canvasSnake.getContext("2d");
   const largeur = canvasSnake.width;
 
-  contexte.fillStyle = "#0e0e0e";
+  // Aire de jeu un peu plus claire que la page, pour detacher le cadre
+  contexte.fillStyle = "#141414";
   contexte.fillRect(0, 0, largeur, largeur);
 
-  contexte.strokeStyle = "#1a1a1a";
+  contexte.strokeStyle = "#242424";
   contexte.lineWidth = 1;
   for (let i = 1; i < TAILLE_GRILLE; i++) {
     contexte.beginPath();
@@ -298,6 +299,13 @@ function dessiner() {
     contexte.lineTo(largeur, i * TAILLE_CASE);
     contexte.stroke();
   }
+
+  // Cadre en pointilles : les bords se traversent, ils ne tuent pas
+  contexte.strokeStyle = "#5c7a24";
+  contexte.lineWidth = 2;
+  contexte.setLineDash([TAILLE_CASE / 2, TAILLE_CASE / 2]);
+  contexte.strokeRect(1, 1, largeur - 2, largeur - 2);
+  contexte.setLineDash([]);
 
   // Murs
   contexte.fillStyle = "#3a3a3a";
@@ -338,7 +346,7 @@ function dessiner() {
   });
 
   if (partieTerminee) {
-    contexte.fillStyle = "rgba(14, 14, 14, 0.8)";
+    contexte.fillStyle = "rgba(14, 14, 14, 0.82)";
     contexte.fillRect(0, 0, largeur, largeur);
     contexte.fillStyle = "#c8f060";
     contexte.font = "80px 'Bebas Neue', Impact, sans-serif";

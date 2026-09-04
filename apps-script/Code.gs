@@ -12,6 +12,9 @@
 const ONGLET_SCORES = "scores";
 const TAILLE_CLASSEMENT = 10;
 const ENVOIS_MAX_PAR_HEURE = 30;
+const LONGUEUR_PSEUDO = 9;
+// Un envoi identique dans cet intervalle est considere comme un doublon
+const SECONDES_ANTI_DOUBLON = 60;
 
 // Sens du tri et bornes de plausibilite, un par classement.
 // "bas" signifie que le petit score gagne (un temps, des billes restantes).
@@ -61,8 +64,8 @@ function doPost(evenement) {
     return reponseJson({ erreur: "Score hors des valeurs plausibles" });
   }
 
-  // Trois caracteres alphanumeriques, comme sur une borne
-  let nom = String(corps.nom || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 3);
+  // Pseudo alphanumerique, en majuscules
+  let nom = String(corps.nom || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, LONGUEUR_PSEUDO);
   if (nom === "") {
     nom = "AAA";
   }
@@ -81,6 +84,12 @@ function doPost(evenement) {
 
     if (envoisRecents(feuille, empreinte) >= ENVOIS_MAX_PAR_HEURE) {
       return reponseJson({ erreur: "Trop d envois, reessaie plus tard" });
+    }
+
+    // Le navigateur peut renvoyer deux fois le meme score quand la reponse
+    // du premier envoi n'a pas pu etre lue. On ne l'ecrit qu'une fois.
+    if (dejaEnregistre(feuille, jeu, nom, score, empreinte)) {
+      return reponseJson({ enregistre: false, doublon: true, jeu: jeu, scores: meilleursScores(jeu) });
     }
 
     feuille.appendRow([jeu, nom, score, new Date(), empreinte]);
@@ -123,6 +132,17 @@ function meilleursScores(jeu) {
     }))
     .sort((a, b) => sens === "bas" ? a.score - b.score : b.score - a.score)
     .slice(0, TAILLE_CLASSEMENT);
+}
+
+// Meme jeu, meme pseudo, meme score, meme visiteur, il y a moins d'une minute
+function dejaEnregistre(feuille, jeu, nom, score, empreinte) {
+  const limite = Date.now() - SECONDES_ANTI_DOUBLON * 1000;
+  return lignes(feuille).some(ligne =>
+    String(ligne[0]) === jeu
+    && String(ligne[1]) === nom
+    && Number(ligne[2]) === score
+    && String(ligne[4]) === empreinte
+    && new Date(ligne[3]).getTime() > limite);
 }
 
 function envoisRecents(feuille, empreinte) {
