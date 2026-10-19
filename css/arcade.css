@@ -1,0 +1,444 @@
+/* =====================================================================
+   ARCADE - menu en cartouches et ecran titre
+   ===================================================================== */
+
+/* ===== Menu ===== */
+/* Opaque : la calculatrice ne doit pas transparaitre derriere le titre */
+.menu-arcade {
+  align-items: center;
+  background-color: var(--fond);
+}
+
+.menu-entete,
+.menu-progression,
+.menu-grille,
+.menu-pied {
+  width: min(1080px, 100%);
+}
+
+.menu-entete {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.menu-arcade .overlay-titre {
+  font-size: clamp(2.6rem, 7vw, 4.4rem);
+  font-weight: 900;
+}
+
+.menu-sous-titre {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 14px;
+  margin-top: 8px;
+  font-size: 0.64rem;
+  letter-spacing: 0.08em;
+  color: var(--texte-sourd);
+}
+
+.menu-sous-titre [lang="ja"] {
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+  color: #e0574b;
+}
+
+/* Jauge du carnet de codes */
+.menu-progression {
+  height: 2px;
+  background-color: var(--bord);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.menu-progression span {
+  display: block;
+  height: 100%;
+  width: 0;
+  background-color: var(--accent);
+  transition: width 0.6s var(--courbe);
+}
+
+.menu-grille {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 10px;
+}
+
+.menu-grille li {
+  display: flex;
+}
+
+.cartouche {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 14px 12px;
+  text-align: left;
+  font-family: var(--police-mono);
+  color: var(--texte);
+  background-color: var(--panneau);
+  border: 1px solid var(--bord);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s var(--courbe), background-color 0.15s;
+}
+
+/* Une cartouche dont le code a ete trouve porte un liseré lime */
+.cartouche.decouverte {
+  box-shadow: inset 0 2px 0 var(--accent);
+}
+
+.cartouche:hover,
+.cartouche:focus-visible {
+  border-color: var(--accent);
+  background-color: var(--panneau-clair);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.cart-haut {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.cart-num {
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  color: var(--texte-eteint);
+}
+
+.cart-jp {
+  font-size: 0.82rem;
+  color: #e0574b;
+}
+
+.cart-nom {
+  font-family: var(--police-affichage);
+  font-weight: 800;
+  font-stretch: 70%;
+  font-size: 1.75rem;
+  line-height: 0.95;
+  text-transform: uppercase;
+  color: var(--texte);
+}
+
+.cart-code {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: var(--texte-eteint);
+}
+
+.decouverte .cart-code {
+  color: var(--accent);
+}
+
+.cart-pitch {
+  font-family: var(--police-texte);
+  font-size: 0.82rem;
+  line-height: 1.35;
+  color: var(--texte);
+}
+
+.cart-enigme {
+  font-family: var(--police-texte);
+  font-size: 0.74rem;
+  line-height: 1.4;
+  font-style: italic;
+  color: var(--texte-eteint);
+}
+
+/* Ton record et le n°1 mondial */
+.cart-scores {
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px dashed var(--bord);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cart-ligne {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 0.56rem;
+  letter-spacing: 0.04em;
+  color: var(--texte-eteint);
+}
+
+.cart-ligne strong {
+  font-weight: 600;
+  font-size: 0.62rem;
+  color: var(--texte-sourd);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.cart-ligne.a-moi strong {
+  color: var(--accent);
+}
+
+.cart-ligne.monde strong {
+  color: var(--texte);
+}
+
+.menu-pied {
+  justify-content: center;
+}
+
+@media (max-width: 560px) {
+  .menu-grille {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .cartouche {
+    padding: 11px 10px 10px;
+    gap: 5px;
+  }
+
+  .cart-nom {
+    font-size: 1.3rem;
+  }
+
+  .cart-enigme {
+    font-size: 0.68rem;
+  }
+
+  .cart-pitch {
+    font-size: 0.74rem;
+  }
+
+  .cart-jp {
+    font-size: 0.7rem;
+  }
+}
+
+/* ===== Ecran titre ===== */
+.carte-titre {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background-color: var(--fond-profond);
+  display: grid;
+  place-items: center;
+  padding: 24px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px));
+  overflow-y: auto;
+  overflow-x: hidden;
+  cursor: pointer;
+  transition: opacity 0.2s ease-out;
+}
+
+.carte-titre[hidden] {
+  display: none;
+}
+
+.carte-titre.sortie {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.carte-contenu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+  max-width: 100%;
+}
+
+.carte-code {
+  font-size: 0.66rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--texte-sourd);
+}
+
+.carte-code.nouveau {
+  color: var(--accent);
+}
+
+.carte-jp {
+  font-size: clamp(1rem, 2.4vw, 1.5rem);
+  letter-spacing: 0.2em;
+  color: #e0574b;
+}
+
+/* Le nom s'elargit en meme temps que l'ecran s'ouvre */
+.carte-nom {
+  font-family: var(--police-affichage);
+  font-weight: 900;
+  font-size: clamp(2.8rem, 10vw, 8rem);
+  line-height: 0.9;
+  text-transform: uppercase;
+  color: var(--texte);
+  font-stretch: 112%;
+  overflow-wrap: anywhere;
+  animation: elargir 0.62s var(--courbe) both;
+}
+
+@keyframes elargir {
+  from {
+    font-stretch: 55%;
+    letter-spacing: 0.04em;
+  }
+  to {
+    font-stretch: 112%;
+    letter-spacing: 0;
+  }
+}
+
+
+
+.carte-pitch {
+  max-width: 34ch;
+  font-family: var(--police-texte);
+  font-size: clamp(0.9rem, 2vw, 1.05rem);
+  line-height: 1.4;
+  color: var(--texte-sourd);
+}
+
+.carte-invite {
+  margin-top: 18px;
+  font-size: 0.58rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--texte-eteint);
+}
+
+/* Classements de l'ecran titre */
+.carte-classements {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 14px 40px;
+  width: min(620px, 100%);
+  margin-top: 10px;
+  text-align: left;
+}
+
+.carte-bloc {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.carte-etiquette {
+  font-size: 0.56rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--texte-eteint);
+}
+
+.carte-top {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.carte-top li {
+  display: grid;
+  grid-template-columns: 2.4em minmax(0, 1fr) auto;
+  gap: 10px;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--bord);
+  font-size: 0.72rem;
+  color: var(--texte-sourd);
+  font-variant-numeric: tabular-nums;
+}
+
+.carte-top li:first-child {
+  color: var(--texte);
+}
+
+.carte-top li:first-child .carte-rang-num {
+  color: var(--accent);
+}
+
+.carte-top li.moi,
+.carte-top li.moi .carte-rang-num {
+  color: var(--accent);
+}
+
+.carte-rang-num {
+  color: var(--texte-eteint);
+}
+
+.carte-nom-joueur {
+  letter-spacing: 0.12em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.carte-top li.carte-vide {
+  display: block;
+  border-bottom: none;
+  font-family: var(--police-texte);
+  font-size: 0.82rem;
+  color: var(--texte-sourd);
+}
+
+.carte-perso {
+  font-family: var(--police-affichage);
+  font-weight: 800;
+  font-stretch: var(--etroit);
+  font-size: 2.6rem;
+  line-height: 1;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.carte-rang {
+  font-family: var(--police-texte);
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--texte-sourd);
+}
+
+.carte-invite kbd {
+  font-family: var(--police-mono);
+  font-size: 0.58rem;
+  color: var(--texte);
+  border: 1px solid var(--bord-fort);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin-right: 6px;
+}
+
+@media (max-width: 560px) {
+  .carte-classements {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .carte-contenu {
+    gap: 10px;
+  }
+}
+
+/* L'invite parle au clavier ou au doigt selon l'appareil */
+.invite-tactile {
+  display: none;
+}
+
+@media (pointer: coarse) {
+  .invite-clavier {
+    display: none;
+  }
+
+  .invite-tactile {
+    display: inline;
+  }
+}

@@ -1,0 +1,36 @@
+/* =====================================================================
+   LIGHTS OUT
+   Canvas dimensionne en JS (520 x 660 logiques), net a toute
+   resolution. L'en-tete ne garde que les boutons.
+   ===================================================================== */
+
+.jeu-toro {
+  gap: 8px;
+}
+
+.entete-toro {
+  width: min(96vw, 600px);
+  justify-content: flex-end;
+}
+
+.toro-boutons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+  justify-content: flex-end;
+}
+
+.toro-boutons .jeu-quitter:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+#canvasToro {
+  display: block;
+  max-width: 96vw;
+  border-radius: 14px;
+  border: 1px solid var(--bord-fort);
+  touch-action: none;
+  cursor: pointer;
+}

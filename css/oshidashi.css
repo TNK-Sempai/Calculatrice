@@ -1,0 +1,58 @@
+/* =====================================================================
+   OSHIDASHI (Abalone)
+   ===================================================================== */
+
+.jeu-oshidashi {
+  gap: 10px;
+}
+
+.entete-oshidashi {
+  width: min(94vw, 600px);
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+
+.entete-oshidashi .entete-boutons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.jeu-oshidashi .jeu-quitter:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+#canvasOshi {
+  display: block;
+  max-width: 96vw;
+  border-radius: 12px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.jeu-oshidashi .jeu-message {
+  font-family: var(--police-texte);
+  font-size: 0.9rem;
+  color: var(--texte);
+  text-align: center;
+  min-height: 1.4em;
+  max-width: min(94vw, 600px);
+}
+
+@media (max-width: 560px) {
+  .entete-oshidashi .entete-boutons {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+/* Petit telephone : en-tete serre, pour laisser la place au plateau */
+@media (max-width: 420px) {
+  .entete-oshidashi { gap: 4px 8px; }
+  .entete-oshidashi .jeu-score strong { font-size: 1.15rem; }
+  .entete-oshidashi .entete-boutons { gap: 4px; }
+  .entete-oshidashi .jeu-quitter,
+  #jeuOshidashi .scores-ligne button { padding: 4px 7px; font-size: 0.56rem; }
+}

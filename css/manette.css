@@ -1,0 +1,355 @@
+/* =====================================================================
+   MANETTE - croix, A, B, Start, Select sur ecran tactile
+   La hauteur est publiee dans --hauteur-manette : chaque jeu s'en sert
+   pour que son plateau tienne au-dessus.
+   ===================================================================== */
+
+:root {
+  --hauteur-manette: 0px;
+}
+
+body.avec-manette {
+  --hauteur-manette: calc(196px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Le jeu laisse la place a la manette et range son aide clavier */
+body.avec-manette .jeu {
+  padding-bottom: calc(var(--hauteur-manette) + 8px);
+}
+
+/* Le jeu se cale juste au-dessus de la manette, a portee des yeux et des pouces */
+body.avec-manette .jeu > *:last-child {
+  margin-bottom: 0;
+}
+
+body.avec-manette .jeu-aide,
+body.avec-manette .commandes-tactiles {
+  display: none !important;
+}
+
+/* Aucune selection ni loupe sur les zones de jeu tactiles */
+.jeu,
+.jeu canvas,
+.manette,
+.manette * {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.manette {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 18;
+  height: var(--hauteur-manette);
+  padding: 14px max(18px, env(safe-area-inset-right, 0px)) calc(14px + env(safe-area-inset-bottom, 0px)) max(18px, env(safe-area-inset-left, 0px));
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--panneau);
+  border-top: 1px solid var(--bord-fort);
+  touch-action: none;
+}
+
+.manette[hidden] {
+  display: none;
+}
+
+/* ===== Croix ===== */
+.manette-croix {
+  position: relative;
+  flex: none;
+  width: 138px;
+  height: 138px;
+  touch-action: none;
+}
+
+.croix-bras,
+.croix-centre {
+  position: absolute;
+  background-color: var(--panneau-clair);
+  border: 1px solid var(--bord-fort);
+}
+
+.croix-centre {
+  left: 46px;
+  top: 46px;
+  width: 46px;
+  height: 46px;
+  border: none;
+  background-color: var(--panneau-clair);
+}
+
+.croix-haut,
+.croix-bas {
+  left: 46px;
+  width: 46px;
+  height: 48px;
+}
+
+.croix-haut {
+  top: 0;
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+}
+
+.croix-bas {
+  bottom: 0;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+}
+
+.croix-gauche,
+.croix-droite {
+  top: 46px;
+  width: 48px;
+  height: 46px;
+}
+
+.croix-gauche {
+  left: 0;
+  border-right: none;
+  border-radius: 8px 0 0 8px;
+}
+
+.croix-droite {
+  right: 0;
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+}
+
+/* Petite fleche gravee dans chaque bras */
+.croix-bras::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+  transform: translate(-50%, -50%);
+}
+
+.croix-haut::after {
+  border-bottom-color: var(--texte-sourd);
+  margin-top: -3px;
+}
+
+.croix-bas::after {
+  border-top-color: var(--texte-sourd);
+  margin-top: 3px;
+}
+
+.croix-gauche::after {
+  border-right-color: var(--texte-sourd);
+  margin-left: -3px;
+}
+
+.croix-droite::after {
+  border-left-color: var(--texte-sourd);
+  margin-left: 3px;
+}
+
+.croix-bras.enfonce {
+  background-color: #262632;
+}
+
+.croix-haut.enfonce::after {
+  border-bottom-color: var(--accent);
+}
+
+.croix-bas.enfonce::after {
+  border-top-color: var(--accent);
+}
+
+.croix-gauche.enfonce::after {
+  border-right-color: var(--accent);
+}
+
+.croix-droite.enfonce::after {
+  border-left-color: var(--accent);
+}
+
+/* ===== Start / Select ===== */
+/* Start et Select en bas, au centre, comme sur la console */
+.manette-centre {
+  position: absolute;
+  left: 50%;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+}
+
+.manette-pilule {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--police-mono);
+  font-size: 0.5rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--texte-eteint);
+  touch-action: none;
+}
+
+.manette-pilule::before {
+  content: "";
+  width: 36px;
+  height: 12px;
+  border-radius: 999px;
+  background-color: var(--panneau-clair);
+  border: 1px solid var(--bord-fort);
+}
+
+.manette-pilule.enfonce::before {
+  background-color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* ===== A et B, en diagonale comme sur la console ===== */
+.manette-boutons {
+  position: relative;
+  flex: none;
+  width: 140px;
+  height: 132px;
+}
+
+.manette-bouton {
+  position: absolute;
+  width: 66px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  touch-action: none;
+}
+
+.manette-bouton[hidden] {
+  display: none;
+}
+
+.bouton-a {
+  right: 0;
+  top: 0;
+}
+
+.bouton-b {
+  left: 0;
+  top: 38px;
+}
+
+/* Un seul bouton : il se place au centre de la zone */
+.manette-boutons.un-seul .manette-bouton {
+  left: 37px;
+  right: auto;
+  top: 20px;
+}
+
+.manette-bouton .rond {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: var(--panneau-clair);
+  border: 2px solid var(--bord-fort);
+  display: block;
+  transition: transform 0.05s;
+}
+
+.bouton-a .rond {
+  border-color: var(--accent-sombre);
+}
+
+.manette-bouton .nom {
+  position: absolute;
+  top: 18px;
+  font-family: var(--police-affichage);
+  font-weight: 800;
+  font-size: 1.3rem;
+  line-height: 1;
+  color: var(--texte-sourd);
+  pointer-events: none;
+}
+
+.bouton-a .nom {
+  color: var(--accent);
+}
+
+.manette-bouton .libelle {
+  font-family: var(--police-mono);
+  font-size: 0.5rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--texte-sourd);
+  white-space: nowrap;
+}
+
+.manette-bouton.enfonce .rond {
+  transform: translateY(2px);
+  background-color: #262632;
+}
+
+.bouton-a.enfonce .rond {
+  background-color: var(--accent);
+}
+
+.bouton-a.enfonce .nom {
+  color: var(--fond);
+}
+
+@media (max-width: 360px) {
+  .manette-croix {
+    transform: scale(0.88);
+    transform-origin: left center;
+  }
+
+  .manette-boutons {
+    transform: scale(0.88);
+    transform-origin: right center;
+  }
+}
+
+/* En paysage sur telephone, la manette encadre l'ecran de jeu */
+@media (pointer: coarse) and (orientation: landscape) and (max-height: 500px) {
+  body.avec-manette {
+    --hauteur-manette: 0px;
+  }
+
+  body.avec-manette .jeu {
+    padding-left: 190px;
+    padding-right: 190px;
+  }
+
+  .manette {
+    top: 0;
+    height: auto;
+    background: none;
+    border: none;
+    pointer-events: none;
+  }
+
+  .manette > * {
+    pointer-events: auto;
+  }
+
+  .manette-centre {
+    align-self: end;
+  }
+}
+
+/* Un bouton qui n'a pas de role dans ce jeu reste visible mais eteint */
+.manette-bouton.inactif .rond {
+  border-color: var(--bord);
+  background-color: var(--panneau);
+}
+
+.manette-bouton.inactif .nom {
+  color: var(--texte-eteint);
+}

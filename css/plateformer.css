@@ -1,0 +1,220 @@
+/* =====================================================================
+   PLATEFORMER - bac a sable
+   ===================================================================== */
+
+.jeu-plateformer {
+  gap: 10px;
+}
+
+.entete-plateformer {
+  width: min(94vw, 640px);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* La scene garde le canvas et le panneau de reglage cote a cote */
+.scene-plateformer {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: 96vw;
+}
+
+/* Taille calculee en JS (place disponible, densite de l'ecran) */
+#canvasPlateformer {
+  display: block;
+  max-width: 96vw;
+  background-color: var(--fond);
+  border: 1px solid var(--bord-fort);
+  border-radius: 8px;
+  touch-action: none;
+}
+
+/* ===== Panneau de reglage, ouvert par F2 ===== */
+.reglages-plateformer {
+  width: 260px;
+  /* Au-dessus des panneaux de classement, qui sont en position fixe :
+     sans cela le panneau de reglage passe dessous et devient illisible. */
+  position: relative;
+  z-index: 16;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  background-color: var(--panneau);
+  border: 1px solid var(--bord);
+  border-radius: 6px;
+  max-height: min(calc(100vh - 200px), 640px);
+  overflow-y: auto;
+}
+
+.reglages-plateformer[hidden] {
+  display: none;
+}
+
+.reglage {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 2px 8px;
+}
+
+.reglage-nom {
+  font-size: 0.64rem;
+  letter-spacing: 0.06em;
+  color: var(--texte-sourd);
+}
+
+.reglage-valeur {
+  font-family: var(--police-affichage);
+  font-stretch: var(--etroit);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--accent);
+}
+
+.reglage input[type="range"] {
+  grid-column: span 2;
+  width: 100%;
+  height: 16px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.reglage-sortie {
+  width: 100%;
+  height: 130px;
+  font-family: var(--police-mono);
+  font-size: 0.62rem;
+  color: var(--accent);
+  background-color: var(--fond);
+  border: 1px solid var(--bord);
+  border-radius: 4px;
+  padding: 6px;
+  resize: vertical;
+}
+
+/* ===== En-tete de Tanukiland ===== */
+.entete-tanukiland {
+  width: min(96vw, 1100px);
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  justify-content: flex-end;
+}
+
+/* Vies, feuilles, score, temps et niveau sont dessines dans le jeu */
+.entete-tanukiland .jeu-score {
+  display: none;
+}
+
+/* ===== Commandes tactiles =====
+   Trois boutons larges, assez hauts pour le pouce, affiches seulement
+   quand le jeu detecte un ecran tactile. Le bouton de saut se maintient
+   comme la touche du clavier, sinon la hauteur variable serait perdue
+   au doigt. */
+.commandes-tactiles {
+  display: flex;
+  gap: 10px;
+  width: min(94vw, 640px);
+  margin-top: 4px;
+}
+
+.commandes-tactiles[hidden] {
+  display: none;
+}
+
+.bouton-tactile {
+  flex: 1;
+  min-height: 64px;
+  font-family: var(--police-affichage);
+  font-stretch: var(--etroit);
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  background-color: var(--panneau);
+  border: 1px solid var(--bord);
+  border-radius: 8px;
+  /* Un appui long ne doit ni selectionner ni ouvrir de menu */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: none;
+}
+
+.bouton-tactile:active {
+  background-color: var(--accent-sombre);
+  color: var(--fond);
+}
+
+.bouton-saut {
+  flex: 1.4;
+}
+
+/* ===== Section Test du panneau F2 =====
+   Des outils de mise au point, pas une option de jeu : ils ne sont
+   accessibles que par F2 et ne sont annonces nulle part. */
+.reglage-section {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--bord);
+}
+
+.reglage-case {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.64rem;
+  letter-spacing: 0.06em;
+  color: var(--texte-sourd);
+  cursor: pointer;
+}
+
+.reglage-case input[type="checkbox"] {
+  accent-color: var(--accent);
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+
+.reglage-choix {
+  margin-top: 4px;
+}
+
+.reglage-choix select {
+  flex: 1;
+  /* Sans cela, la largeur du plus long nom de niveau impose la sienne et
+     fait deborder le panneau. */
+  min-width: 0;
+  font-family: inherit;
+  font-size: 0.62rem;
+  color: var(--accent);
+  background-color: var(--fond);
+  border: 1px solid var(--bord);
+  border-radius: 4px;
+  padding: 3px 4px;
+  cursor: pointer;
+}
+
+/* L'indicateur de mode test. Tant qu'il est la, aucun score n'est
+   enregistre. Il est hors du flux, au coin de l'ecran : dans l'en-tete
+   il la faisait passer a deux lignes et poussait le jeu hors du cadre.
+   Les classements lateraux sont centres verticalement, ce coin leur
+   reste libre. */
+.indicateur-test {
+  position: absolute;
+  top: 8px;
+  right: 14px;
+  z-index: 17;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  color: var(--fond);
+  background-color: var(--accent);
+  padding: 3px 9px;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.indicateur-test[hidden] {
+  display: none;
+}

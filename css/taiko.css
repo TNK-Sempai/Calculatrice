@@ -1,0 +1,29 @@
+/* =====================================================================
+   TAIKO
+   La taille du canvas est calculee en JS (net a toute resolution,
+   place laissee aux panneaux lateraux et a la manette).
+   ===================================================================== */
+
+.jeu-taiko {
+  gap: 8px;
+}
+
+.entete-taiko {
+  width: min(96vw, 620px);
+  justify-content: flex-end;
+}
+
+#canvasTaiko {
+  display: block;
+  max-width: 96vw;
+  background-color: #120f2c;
+  border: 1px solid var(--bord-fort);
+  border-radius: 12px;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.jeu-taiko .jeu-aide {
+  max-width: min(96vw, 620px);
+}

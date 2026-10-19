@@ -1,0 +1,318 @@
+/* =====================================================================
+   DEMINEUR - un jardin de pierres, du sable ratisse dessous
+   La taille des dalles (--case-demineur) est calculee en JS selon la
+   place restante. En Difficile sur petit ecran, la grille defile dans
+   son cadre, jamais la page.
+   ===================================================================== */
+
+.jeu-demineur {
+  --colonnes: 9;
+  --lignes: 9;
+  --case-demineur: 36px;
+  --sable: #e9dcc0;
+  --sable-ombre: #c9b893;
+  --encre: #2a2622;
+  gap: 8px;
+}
+
+.entete-demineur {
+  width: min(96vw, 1000px);
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+
+.entete-demineur .entete-boutons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+}
+
+#drapeauDemineur.active,
+#hasardDemineur.active {
+  color: var(--fond);
+  background-color: var(--accent);
+  border-color: var(--accent);
+}
+
+#difficultesDemineur .mode-jour {
+  border-color: rgba(200, 55, 45, 0.6);
+  color: #e0574b;
+}
+
+#difficultesDemineur .mode-jour.active {
+  color: var(--texte);
+  background-color: var(--vermillon);
+  border-color: var(--vermillon);
+}
+
+/* Le cadre : bois laque sombre, filet d'or, mousse au fond */
+.cadre-demineur {
+  position: relative;
+  max-width: min(96vw, 1000px);
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 10px;
+  background-color: #33402a;
+  border: 4px solid #2a1c14;
+  outline: 1px solid #8a6a2a;
+  outline-offset: -8px;
+  border-radius: 12px;
+  box-shadow: 0 6px 0 #1a120c;
+  touch-action: pan-x;
+}
+
+.grille-demineur {
+  display: grid;
+  grid-template-columns: repeat(var(--colonnes), var(--case-demineur));
+  grid-auto-rows: var(--case-demineur);
+  gap: 2px;
+  width: max-content;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.eclats-demineur {
+  position: absolute;
+  display: none;
+  pointer-events: none;
+}
+
+/* Une dalle de granit fermee : face eclairee en haut a gauche, epaisseur
+   sombre en bas a droite. Des ombres nettes, jamais floues. */
+.case-demineur {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(150deg, #9aa093 0%, #7d8377 55%, #6a7064 100%);
+  border-radius: 5px;
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 255, 255, 0.28),
+    inset -2px -3px 0 rgba(0, 0, 0, 0.32);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 92%;
+  font-family: var(--police-affichage);
+  font-weight: 800;
+  font-stretch: 80%;
+  font-size: calc(var(--case-demineur) * 0.62);
+  line-height: 1;
+  color: var(--texte-sourd);
+  cursor: pointer;
+  transition: transform 0.08s;
+}
+
+/* Les dalles n'ont pas toutes la meme pierre : une sur trois plus chaude */
+.case-demineur[data-pierre="chaude"]:not(.ouverte) {
+  background: linear-gradient(150deg, #a19d8f 0%, #858173 55%, #6f6b5e 100%);
+}
+
+.case-demineur[data-pierre="sombre"]:not(.ouverte) {
+  background: linear-gradient(150deg, #8a9088 0%, #6e746a 55%, #5c6258 100%);
+}
+
+.case-demineur:hover:not(.ouverte) {
+  transform: translateY(-1px);
+  background: linear-gradient(150deg, #aab0a2 0%, #8b9184 55%, #757b6e 100%);
+}
+
+/* Soulevee : du sable ratisse, en creux */
+.case-demineur.ouverte {
+  background: var(--sable);
+  box-shadow: inset 2px 2px 0 var(--sable-ombre);
+  border-radius: 3px;
+  cursor: default;
+  transform: none;
+}
+
+.case-demineur.depart {
+  box-shadow: inset 2px 2px 0 var(--sable-ombre), inset 0 0 0 2px #7fa32f;
+}
+
+/* Les chiffres, a l'encre, chacun sa couleur */
+.case-demineur.chiffre-1 { color: #2f4f9e; }
+.case-demineur.chiffre-2 { color: #3f6a12; }
+.case-demineur.chiffre-3 { color: #c8372d; }
+.case-demineur.chiffre-4 { color: #5a3a8a; }
+.case-demineur.chiffre-5 { color: #8a4a1a; }
+.case-demineur.chiffre-6 { color: #1f6f6f; }
+.case-demineur.chiffre-7 { color: #1a1a20; }
+.case-demineur.chiffre-8 { color: #6b675f; }
+
+/* Un yokai revele dans le sable */
+.case-demineur.mine {
+  background-color: #d9c9a4;
+  background-size: 96%;
+}
+
+.case-demineur.explosee {
+  background-color: #c8372d;
+  box-shadow: inset 0 0 0 2px #7e1d14;
+}
+
+/* L'omamori pose sur une dalle */
+.case-demineur.drapeau {
+  background-image: var(--image-omamori), linear-gradient(150deg, #9aa093 0%, #7d8377 55%, #6a7064 100%);
+  background-size: 92%, 100%;
+}
+
+.case-demineur.faux-drapeau {
+  background-image: var(--image-omamori), linear-gradient(150deg, #8a4a42 0%, #6a2a2a 100%);
+}
+
+.case-demineur.doute {
+  color: #f2c63a;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+}
+
+.case-demineur.curseur {
+  outline: 3px solid var(--accent);
+  outline-offset: -3px;
+  z-index: 1;
+}
+
+/* L'onde : la dalle se souleve et se retourne avec le retard de sa distance */
+.case-demineur.onde {
+  animation: demineur-onde 0.26s ease-out both;
+}
+
+@keyframes demineur-onde {
+  0% {
+    transform: scale(1) translateY(0);
+    background: #858b7f;
+    color: transparent;
+  }
+  45% {
+    transform: scale(0.6) translateY(-3px);
+    background: #858b7f;
+    color: transparent;
+  }
+  100% {
+    transform: none;
+  }
+}
+
+/* L'omamori se pose d'un petit coup sec */
+.case-demineur.pose {
+  animation: demineur-pose 0.24s ease-out both;
+}
+
+@keyframes demineur-pose {
+  from {
+    background-size: 125%, 100%;
+  }
+  to {
+    background-size: 92%, 100%;
+  }
+}
+
+/* Apres une explosion, les autres yokai se reveillent */
+.case-demineur.reveil {
+  animation: demineur-reveil 0.3s ease-out both;
+}
+
+@keyframes demineur-reveil {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+/* Bandeau de fin, pose au centre du jardin */
+.fin-demineur {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(300px, 80vw);
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 18px 14px;
+  background-color: #fbf1de;
+  border: 3px solid #c8372d;
+  border-radius: 14px;
+  box-shadow: 0 5px 0 #7e1d14;
+  text-align: center;
+  z-index: 3;
+  animation: demineur-fin 0.32s ease-out both;
+}
+
+.fin-demineur[hidden] {
+  display: none;
+}
+
+.fin-demineur strong {
+  font-family: var(--police-affichage);
+  font-weight: 800;
+  font-size: 1.5rem;
+  line-height: 1.05;
+  color: #7e1d14;
+}
+
+.fin-demineur.gagne strong {
+  color: #3f6a12;
+}
+
+.fin-demineur span {
+  font-family: var(--police-texte);
+  font-size: 0.86rem;
+  color: #5a4a40;
+}
+
+.fin-demineur .jeu-quitter {
+  margin-top: 4px;
+  color: #fbf1de;
+  background-color: #c8372d;
+  border-color: #c8372d;
+}
+
+@keyframes demineur-fin {
+  from {
+    opacity: 0;
+    margin-top: 14px;
+  }
+  to {
+    opacity: 1;
+    margin-top: 0;
+  }
+}
+
+.jeu-demineur .jeu-message {
+  min-height: 1.3em;
+  font-family: var(--police-texte);
+  font-size: 0.88rem;
+  color: var(--texte-sourd);
+  text-align: center;
+}
+
+@media (max-width: 560px) {
+  .entete-demineur .jeu-score strong {
+    font-size: 1.5rem;
+  }
+
+  .entete-demineur .jeu-score.score-principal .valeur-score {
+    font-size: 1.9rem;
+  }
+
+  .entete-demineur .entete-boutons {
+    width: 100%;
+    justify-content: flex-end;
+    gap: 4px;
+  }
+
+  .entete-demineur .jeu-quitter {
+    padding: 7px 8px;
+    font-size: 0.6rem;
+  }
+
+  .jeu-demineur .jeu-aide {
+    display: none;
+  }
+}

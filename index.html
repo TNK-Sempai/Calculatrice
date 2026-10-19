@@ -2,78 +2,163 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tanuki Calc</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Tanuki Calc - calculatrice scientifique</title>
+  <meta name="description" content="Une calculatrice scientifique en ligne, gratuite et hors ligne : trigonometrie, logarithmes, factorielles, historique imprime. Certains nombres cachent autre chose.">
+  <meta name="theme-color" content="#09090e">
+  <meta name="color-scheme" content="dark">
+  <link rel="canonical" href="https://tnk-sempai.github.io/Calculatrice/">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icones/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="icones/apple-touch-icon.png">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Tanuki Calc">
+  <meta property="og:description" content="Une calculatrice scientifique. Enfin, presque.">
+  <meta property="og:url" content="https://tnk-sempai.github.io/Calculatrice/">
+  <meta property="og:image" content="https://tnk-sempai.github.io/Calculatrice/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preload" href="fonts/anybody.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/martian-mono-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/polices.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/facade.css">
+  <link rel="stylesheet" href="css/arcade.css">
+  <link rel="stylesheet" href="css/manette.css">
+  <link rel="stylesheet" href="css/snake.css">
+  <link rel="stylesheet" href="css/tetris.css">
+  <link rel="stylesheet" href="css/jeu-2048.css">
+  <link rel="stylesheet" href="css/solitaire.css">
+  <link rel="stylesheet" href="css/mahjong.css">
+  <link rel="stylesheet" href="css/yokai-invaders.css">
+  <link rel="stylesheet" href="css/bake-danuki.css">
+  <link rel="stylesheet" href="css/motus.css">
+  <link rel="stylesheet" href="css/toro.css">
+  <link rel="stylesheet" href="css/oekaki.css">
+  <link rel="stylesheet" href="css/tanuki-run.css">
+  <link rel="stylesheet" href="css/flappy-tengu.css">
+  <link rel="stylesheet" href="css/pagode.css">
+  <link rel="stylesheet" href="css/karasu.css">
+  <link rel="stylesheet" href="css/bunbuku.css">
+  <link rel="stylesheet" href="css/kappa.css">
+  <link rel="stylesheet" href="css/go.css">
+  <link rel="stylesheet" href="css/koikoi.css">
+  <link rel="stylesheet" href="css/oshidashi.css">
+  <link rel="stylesheet" href="css/pachinko.css">
+  <link rel="stylesheet" href="css/matsuri.css">
+  <link rel="stylesheet" href="css/gassen.css">
+  <link rel="stylesheet" href="css/omamori.css">
+  <link rel="stylesheet" href="css/shogi.css">
+  <link rel="stylesheet" href="css/taiko.css">
+  <link rel="stylesheet" href="css/bulles.css">
+  <link rel="stylesheet" href="css/versus.css">
+  <link rel="stylesheet" href="css/pong.css">
+  <link rel="stylesheet" href="css/sudoku.css">
+  <link rel="stylesheet" href="css/casse-briques.css">
+  <link rel="stylesheet" href="css/blackjack.css">
+  <link rel="stylesheet" href="css/demineur.css">
+  <link rel="stylesheet" href="css/dames.css">
+  <link rel="stylesheet" href="css/puissance4.css">
+  <link rel="stylesheet" href="css/plateformer.css">
 </head>
 <body>
 
-  <main class="calculatrice" id="calculatrice">
+  <!-- Poste : la calculatrice et son ruban imprime -->
+  <main class="poste" id="calculatrice">
 
-    <!-- En-tete -->
-    <header class="entete">
-      <h1 class="titre" id="titreCalculatrice">Tanuki<span class="titre-creux">Calc</span></h1>
-      <button class="bascule-angle" id="basculeAngle" type="button" aria-label="Unite d'angle">DEG</button>
-    </header>
+    <section class="appareil" id="appareil" aria-label="Calculatrice scientifique">
 
-    <!-- Ecran -->
-    <section class="ecran" aria-live="polite">
-      <div class="expression" id="expression">0</div>
-      <div class="apercu" id="apercu"></div>
+      <header class="entete">
+        <div class="marque">
+          <h1 class="titre" id="titreCalculatrice">Tanuki<span class="titre-creux">Calc</span></h1>
+          <p class="sous-titre"><span lang="ja">狸電卓</span><span class="modele">TC-02 &middot; SCI</span></p>
+        </div>
+        <button class="bascule-angle" id="basculeAngle" type="button" aria-label="Angles en degres">DEG</button>
+      </header>
+
+      <!-- Ecran : voyants, expression, apercu -->
+      <section class="ecran" aria-live="polite">
+        <div class="voyants" aria-hidden="true">
+          <span class="voyant allume" id="voyantAngle">DEG</span>
+          <span class="voyant" id="voyantSecond">2ND</span>
+        </div>
+        <div class="expression" id="expression" title="Cliquer pour copier le resultat">0</div>
+        <div class="apercu" id="apercu"></div>
+      </section>
+
+      <!-- Clavier : data-jeton2 et le second libelle servent en mode 2nd -->
+      <section class="clavier" id="clavier">
+        <button class="touche fonction touche-second" data-action="second" type="button" aria-pressed="false">2nd</button>
+        <button class="touche fonction" data-jeton="(" type="button">(</button>
+        <button class="touche fonction" data-jeton=")" type="button">)</button>
+        <button class="touche fonction double" data-jeton="%" data-jeton2="fact" type="button"><span class="l1">%</span><span class="l2">n!</span></button>
+        <button class="touche controle" data-action="effacer" type="button" aria-label="Tout effacer">C</button>
+
+        <button class="touche fonction double" data-jeton="sin" data-jeton2="asin" type="button"><span class="l1">sin</span><span class="l2">sin<sup>-1</sup></span></button>
+        <button class="touche fonction double" data-jeton="cos" data-jeton2="acos" type="button"><span class="l1">cos</span><span class="l2">cos<sup>-1</sup></span></button>
+        <button class="touche fonction double" data-jeton="tan" data-jeton2="atan" type="button"><span class="l1">tan</span><span class="l2">tan<sup>-1</sup></span></button>
+        <button class="touche fonction double" data-jeton="ln" data-jeton2="exp" type="button"><span class="l1">ln</span><span class="l2">e<sup>x</sup></span></button>
+        <button class="touche fonction double" data-jeton="log" data-jeton2="pow10" type="button"><span class="l1">log</span><span class="l2">10<sup>x</sup></span></button>
+
+        <button class="touche fonction double" data-jeton="sqrt" data-jeton2="cbrt" type="button"><span class="l1">&radic;</span><span class="l2">&#8731;</span></button>
+        <button class="touche fonction double" data-jeton="carre" data-jeton2="cube" type="button"><span class="l1">x&sup2;</span><span class="l2">x&sup3;</span></button>
+        <button class="touche fonction" data-jeton="^" type="button"><span>x<sup>y</sup></span></button>
+        <button class="touche fonction double" data-jeton="pi" data-jeton2="inv" type="button"><span class="l1">&pi;</span><span class="l2">1/x</span></button>
+        <button class="touche fonction" data-jeton="e" type="button" aria-label="Constante e">e</button>
+
+        <button class="touche chiffre" data-jeton="7" type="button">7</button>
+        <button class="touche chiffre" data-jeton="8" type="button">8</button>
+        <button class="touche chiffre" data-jeton="9" type="button">9</button>
+        <button class="touche operateur" data-jeton="/" type="button" aria-label="Diviser">&divide;</button>
+        <button class="touche controle" data-action="retour" type="button" aria-label="Effacer le dernier caractere">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 5h11v14H9l-6-7z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 9.5l5 5m0-5l-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+
+        <button class="touche chiffre" data-jeton="4" type="button">4</button>
+        <button class="touche chiffre" data-jeton="5" type="button">5</button>
+        <button class="touche chiffre" data-jeton="6" type="button">6</button>
+        <button class="touche operateur" data-jeton="*" type="button" aria-label="Multiplier">&times;</button>
+        <button class="touche operateur" data-jeton="-" type="button" aria-label="Soustraire">&minus;</button>
+
+        <button class="touche chiffre" data-jeton="1" type="button">1</button>
+        <button class="touche chiffre" data-jeton="2" type="button">2</button>
+        <button class="touche chiffre" data-jeton="3" type="button">3</button>
+        <button class="touche operateur" data-jeton="+" type="button" aria-label="Additionner">+</button>
+        <button class="touche egal" data-action="egal" type="button" aria-label="Egal">=</button>
+
+        <button class="touche chiffre" data-jeton="0" type="button">0</button>
+        <button class="touche chiffre" data-jeton="." type="button" aria-label="Virgule">,</button>
+        <button class="touche fonction" data-action="signe" type="button" aria-label="Changer le signe">&plusmn;</button>
+        <button class="touche fonction" data-jeton="ans" type="button">ans</button>
+      </section>
+
+      <footer class="pied-calc">
+        <a class="lien-pied" href="https://docs.google.com/forms/d/e/1FAIpQLSfHVda_NV80NzQLQhvvKFlw5rIvMiPUarLWE4-xth_A424-iw/viewform" target="_blank" rel="noopener">Une suggestion ?</a>
+        <span class="compteur-secrets" id="compteurSecrets" hidden></span>
+        <a class="lien-pied cafe" href="https://ko-fi.com/B0B31Z3AVY" target="_blank" rel="noopener">Offrir un caf&eacute;</a>
+      </footer>
     </section>
 
-    <!-- Clavier scientifique -->
-    <section class="clavier" id="clavier">
-      <button class="bouton fonction" data-jeton="sin">sin</button>
-      <button class="bouton fonction" data-jeton="cos">cos</button>
-      <button class="bouton fonction" data-jeton="tan">tan</button>
-      <button class="bouton fonction" data-jeton="(">(</button>
-      <button class="bouton fonction" data-jeton=")">)</button>
-
-      <button class="bouton fonction" data-jeton="ln">ln</button>
-      <button class="bouton fonction" data-jeton="log">log</button>
-      <button class="bouton fonction" data-jeton="sqrt">&radic;</button>
-      <button class="bouton fonction" data-jeton="carre">x&sup2;</button>
-      <button class="bouton fonction" data-jeton="^">x<sup>y</sup></button>
-
-      <button class="bouton fonction" data-jeton="pi">&pi;</button>
-      <button class="bouton fonction" data-jeton="e">e</button>
-      <button class="bouton fonction" data-jeton="%">%</button>
-      <button class="bouton controle" data-action="retour">&#9003;</button>
-      <button class="bouton controle" data-action="effacer">C</button>
-
-      <button class="bouton chiffre" data-jeton="7">7</button>
-      <button class="bouton chiffre" data-jeton="8">8</button>
-      <button class="bouton chiffre" data-jeton="9">9</button>
-      <button class="bouton operateur" data-jeton="/">&divide;</button>
-      <button class="bouton operateur" data-jeton="*">&times;</button>
-
-      <button class="bouton chiffre" data-jeton="4">4</button>
-      <button class="bouton chiffre" data-jeton="5">5</button>
-      <button class="bouton chiffre" data-jeton="6">6</button>
-      <button class="bouton operateur" data-jeton="-">&minus;</button>
-      <button class="bouton operateur" data-jeton="+">+</button>
-
-      <button class="bouton chiffre" data-jeton="1">1</button>
-      <button class="bouton chiffre" data-jeton="2">2</button>
-      <button class="bouton chiffre" data-jeton="3">3</button>
-      <button class="bouton fonction" data-action="signe">&plusmn;</button>
-      <button class="bouton egal" data-action="egal">=</button>
-
-      <button class="bouton chiffre zero" data-jeton="0">0</button>
-      <button class="bouton chiffre" data-jeton=".">.</button>
-      <button class="bouton fonction" data-jeton="ans">ans</button>
-    </section>
-
+    <!-- Ruban : l'historique imprime -->
+    <aside class="ruban" id="ruban" aria-label="Historique des calculs">
+      <div class="ruban-barre">
+        <span class="ruban-titre">Ruban</span>
+        <button class="ruban-action" id="rubanEffacer" type="button">Effacer</button>
+        <button class="ruban-action ruban-deplier" id="rubanDeplier" type="button" aria-expanded="false">Ruban</button>
+      </div>
+      <div class="ruban-papier">
+        <ol class="ruban-liste" id="rubanListe"></ol>
+      </div>
+      <div class="ruban-tete" aria-hidden="true"></div>
+    </aside>
 
   </main>
 
 <!-- Zone de jeu plein ecran (cachee par defaut) -->
   <section class="jeu" id="jeu" hidden>
     <div class="jeu-entete entete-snake">
-      <span class="jeu-score">Score <strong id="score">0</strong></span>
+      <span class="jeu-score score-principal">Score <strong class="valeur-score" id="score">0</strong></span>
       <span class="jeu-score">Pommes <strong id="pommesSnake">0</strong></span>
       <button class="jeu-quitter" id="quitterJeu" type="button">Retour</button>
     </div>
@@ -93,11 +178,16 @@
         </div>
         <div class="tetris-stats">
           <span class="tetris-label">Score</span>
-          <strong id="scoreTetris">0</strong>
+          <strong class="valeur-score" id="scoreTetris">0</strong>
           <span class="tetris-label">Lignes</span>
-          <strong id="lignesTetris">0</strong>
+          <span class="tetris-duo">
+            <strong id="lignesTetris">0</strong>
+            <em class="tetris-taux" id="tauxTetris">-</em>
+          </span>
           <span class="tetris-label">Niveau</span>
           <strong id="niveauTetris">1</strong>
+          <span class="tetris-label">Perfect</span>
+          <strong id="perfectTetris">0</strong>
         </div>
       </aside>
       <canvas id="canvasTetris" width="300" height="600"></canvas>
@@ -116,7 +206,7 @@
   <!-- 2048 plein ecran (cache par defaut) -->
   <section class="jeu jeu-2048" id="jeu2048" hidden>
     <div class="jeu-entete entete-2048">
-      <span class="jeu-score">Score <strong id="score2048">0</strong></span>
+      <span class="jeu-score score-principal">Score <strong class="valeur-score" id="score2048">0</strong></span>
       <span class="jeu-score">Record <strong id="meilleur2048">0</strong></span>
       <button class="jeu-quitter" id="nouvelle2048" type="button">Nouvelle partie</button>
       <button class="jeu-quitter" id="quitter2048" type="button">Retour</button>
@@ -128,7 +218,7 @@
   <!-- Solitaire a billes plein ecran (cache par defaut) -->
   <section class="jeu jeu-solitaire" id="jeuSolitaire" hidden>
     <div class="jeu-entete entete-solitaire">
-      <span class="jeu-score">Billes <strong id="billesSolitaire">32</strong></span>
+      <span class="jeu-score score-principal">Billes <strong class="valeur-score" id="billesSolitaire">32</strong></span>
       <span class="jeu-score">Coups <strong id="coupsSolitaire">0</strong></span>
       <button class="jeu-quitter" id="annulerSolitaire" type="button">Annuler</button>
       <button class="jeu-quitter" id="nouvelleSolitaire" type="button">Nouvelle partie</button>
@@ -143,7 +233,7 @@
   <section class="jeu jeu-blackjack" id="jeuBlackjack" hidden>
     <div class="jeu-entete entete-blackjack">
       <span class="jeu-score">Jetons <strong id="jetonsBlackjack">500</strong></span>
-      <span class="jeu-score">Pic <strong id="picBlackjack">500</strong></span>
+      <span class="jeu-score score-principal">Pic <strong class="valeur-score" id="picBlackjack">500</strong></span>
       <span class="jeu-score">Sabot <strong id="sabotBlackjack">312</strong></span>
       <button class="jeu-quitter" id="encaisserBlackjack" type="button">Encaisser</button>
       <button class="jeu-quitter" id="quitterBlackjack" type="button">Retour</button>
@@ -175,7 +265,7 @@
   <section class="jeu jeu-briques" id="jeuCasseBriques" hidden>
     <div class="jeu-entete entete-briques">
       <span class="jeu-score">Niveau <strong id="niveauBriques">1</strong></span>
-      <span class="jeu-score">Score <strong id="scoreBriques">0</strong></span>
+      <span class="jeu-score score-principal">Score <strong class="valeur-score" id="scoreBriques">0</strong></span>
       <span class="jeu-score">Vies <strong id="viesBriques">3</strong></span>
       <button class="jeu-quitter" id="recommencerBriques" type="button">Recommencer</button>
       <button class="jeu-quitter" id="quitterBriques" type="button">Retour</button>
@@ -188,7 +278,7 @@
   <!-- Sudoku plein ecran (cache par defaut) -->
   <section class="jeu jeu-sudoku" id="jeuSudoku" hidden>
     <div class="jeu-entete entete-sudoku">
-      <span class="jeu-score">Temps <strong id="chronoSudoku">0:00</strong></span>
+      <span class="jeu-score score-principal">Temps <strong class="valeur-score" id="chronoSudoku">0:00</strong></span>
       <span class="jeu-score">Restantes <strong id="restantesSudoku">0</strong></span>
       <button class="jeu-quitter" id="notesSudoku" type="button">Notes</button>
       <button class="jeu-quitter" id="verifierSudoku" type="button">Verifier</button>
@@ -202,24 +292,43 @@
     <p class="jeu-aide">Clique une case puis tape un chiffre. Fleches pour se deplacer, 0 ou Retour pour effacer, N pour le mode notes. Echap : quitter.</p>
   </section>
 
-  <!-- Space Invaders plein ecran (cache par defaut) -->
-  <section class="jeu jeu-invaders" id="jeuInvaders" hidden>
-    <div class="jeu-entete entete-invaders">
-      <span class="jeu-score">Score <strong id="scoreInvaders">0</strong></span>
-      <span class="jeu-score">Vies <strong id="viesInvaders">3</strong></span>
-      <span class="jeu-score">Vague <strong id="vagueInvaders">1</strong></span>
-      <button class="jeu-quitter" id="recommencerInvaders" type="button">Recommencer</button>
-      <button class="jeu-quitter" id="quitterInvaders" type="button">Retour</button>
+  <!-- Yokai Invaders (code 1978) -->
+  <section class="jeu jeu-yokai" id="jeuYokai" hidden>
+    <div class="jeu-entete entete-yokai">
+      <span class="jeu-score score-principal">Score <strong class="valeur-score" id="scoreYokai">0</strong></span>
+      <span class="jeu-score combo-yokai">Combo <strong id="comboYokai">x1</strong></span>
+      <span class="jeu-score">Vague <strong id="vagueYokai">1</strong></span>
+      <span class="jeu-score">Vies <strong id="viesYokai">3</strong></span>
+      <span class="entete-boutons">
+        <button class="jeu-quitter" id="sonYokai" type="button" aria-pressed="false">Son</button>
+        <button class="jeu-quitter" id="recommencerYokai" type="button">Rejouer</button>
+        <button class="jeu-quitter" id="quitterYokai" type="button">Retour</button>
+      </span>
     </div>
-    <p class="jeu-message" id="messageInvaders"></p>
-    <canvas id="canvasInvaders" width="480" height="600"></canvas>
-    <p class="jeu-aide">Fleches, QD ou souris pour bouger. Espace ou clic pour tirer. N : recommencer. Echap : quitter.</p>
+    <canvas id="canvasYokai" width="480" height="640"></canvas>
+    <p class="jeu-aide">Fl&egrave;ches ou Q D pour bouger, Espace (maintenu) pour tirer. Au doigt ou &agrave; la souris : le tanuki suit et tire tant que tu appuies. Ramasse les omamori. P pause, M son, N rejouer, &Eacute;chap quitter.</p>
+  </section>
+
+  <!-- Bake-Danuki (code 1980) -->
+  <section class="jeu jeu-danuki" id="jeuDanuki" hidden>
+    <div class="jeu-entete entete-danuki">
+      <span class="jeu-score score-principal">Score <strong class="valeur-score" id="scoreDanuki">0</strong></span>
+      <span class="jeu-score">Niveau <strong id="niveauDanuki">1</strong></span>
+      <span class="jeu-score">Vies <strong id="viesDanuki">3</strong></span>
+      <span class="entete-boutons">
+        <button class="jeu-quitter" id="sonDanuki" type="button" aria-pressed="false">Son</button>
+        <button class="jeu-quitter" id="recommencerDanuki" type="button">Rejouer</button>
+        <button class="jeu-quitter" id="quitterDanuki" type="button">Retour</button>
+      </span>
+    </div>
+    <canvas id="canvasDanuki" width="304" height="336"></canvas>
+    <p class="jeu-aide">Fl&egrave;ches ou Z Q S D, ou glisse le doigt. Mange tout le riz du sanctuaire. Une feuille transforme le tanuki : les yokai deviennent du papier, croque-les. P pause, M son, N rejouer, &Eacute;chap quitter.</p>
   </section>
 
   <!-- Mahjong solitaire plein ecran (cache par defaut) -->
   <section class="jeu jeu-mahjong" id="jeuMahjong" hidden>
     <div class="jeu-entete entete-mahjong">
-      <span class="jeu-score">Temps <strong id="chronoMahjong">0:00</strong></span>
+      <span class="jeu-score score-principal">Temps <strong class="valeur-score" id="chronoMahjong">0:00</strong></span>
       <span class="jeu-score">Tuiles <strong id="restantesMahjong">144</strong></span>
       <span class="jeu-score">Paires <strong id="pairesMahjong">0</strong></span>
       <button class="jeu-quitter" id="indiceMahjong" type="button">Indice</button>
@@ -233,14 +342,140 @@
     <p class="jeu-aide">Clique deux tuiles identiques et libres. H : indice. M : melanger. Retour arriere : annuler. N : nouvelle partie. Echap : quitter.</p>
   </section>
 
+  <!-- Pong plein ecran (cache par defaut) -->
+  <section class="jeu jeu-pong" id="jeuPong" hidden>
+    <div class="jeu-entete entete-pong">
+      <span class="jeu-score score-principal">Score <strong class="valeur-score" id="scorePong">0</strong></span>
+      <span class="jeu-score">Adversaire <strong id="niveauPong">1</strong></span>
+      <span class="jeu-score">Echange <strong id="echangePong">0</strong></span>
+      <button class="jeu-quitter" id="rejouerPong" type="button">Nouvelle partie</button>
+      <button class="jeu-quitter" id="quitterPong" type="button">Retour</button>
+    </div>
+    <div class="scores-ligne" id="modesPong"></div>
+    <p class="jeu-message" id="messagePong"></p>
+    <canvas id="canvasPong" width="700" height="440"></canvas>
+    <p class="jeu-aide">Fleches haut et bas ou souris pour la raquette verte. En duel, Z et S pour la blanche. Espace ou clic pour servir. N : nouvelle partie. Echap : quitter.</p>
+  </section>
+
+  <!-- Demineur plein ecran (cache par defaut) -->
+  <section class="jeu jeu-demineur" id="jeuDemineur" hidden>
+    <div class="jeu-entete entete-demineur">
+      <span class="jeu-score score-principal">Temps <strong class="valeur-score" id="chronoDemineur">0:00</strong></span>
+      <span class="jeu-score">Mines <strong id="minesDemineur">10</strong></span>
+      <button class="jeu-quitter" id="drapeauDemineur" type="button">Drapeau</button>
+      <button class="jeu-quitter" id="nouvelleDemineur" type="button">Nouvelle grille</button>
+      <button class="jeu-quitter" id="quitterDemineur" type="button">Retour</button>
+    </div>
+    <div class="scores-ligne" id="difficultesDemineur"></div>
+    <div class="cadre-demineur" id="cadreDemineur">
+      <div class="grille-demineur" id="grilleDemineur"></div>
+    </div>
+    <p class="jeu-message" id="messageDemineur"></p>
+    <p class="jeu-aide">Clic pour ouvrir, clic droit ou appui long pour poser un drapeau puis un point d'interrogation. Clic sur un chiffre deja entoure de ses drapeaux pour ouvrir le reste. Fleches et Espace au clavier, F pour un drapeau. N : nouvelle grille. Echap : quitter.</p>
+  </section>
+
+  <!-- Dames internationales plein ecran (cache par defaut) -->
+  <section class="jeu jeu-dames" id="jeuDames" hidden>
+    <div class="jeu-entete entete-dames">
+      <span class="jeu-score score-principal">Toi <strong class="valeur-score" id="piecesJoueurDames">20</strong></span>
+      <span class="jeu-score">Adversaire <strong id="piecesIaDames">20</strong></span>
+      <button class="jeu-quitter" id="annulerDames" type="button">Annuler</button>
+      <button class="jeu-quitter" id="nouvelleDames" type="button">Nouvelle partie</button>
+      <button class="jeu-quitter" id="quitterDames" type="button">Retour</button>
+    </div>
+    <div class="scores-ligne" id="difficultesDames"></div>
+    <div class="damier-dames" id="damierDames"></div>
+    <p class="jeu-message" id="messageDames"></p>
+    <p class="jeu-aide">Clic sur une piece puis sur une case allumee. La prise est obligatoire, et toujours la plus longue : une rafle se clique etape par etape. Retour arriere ou Annuler pour reprendre ton coup. N : nouvelle partie. Echap : quitter.</p>
+  </section>
+
+  <!-- Puissance 4 plein ecran (cache par defaut) -->
+  <section class="jeu jeu-puissance4" id="jeuPuissance4" hidden>
+    <div class="jeu-entete entete-p4">
+      <span class="jeu-score score-principal">Coups <strong class="valeur-score" id="coupsP4">0</strong></span>
+      <button class="jeu-quitter" id="annulerP4" type="button">Annuler</button>
+      <button class="jeu-quitter" id="nouvelleP4" type="button">Nouvelle partie</button>
+      <button class="jeu-quitter" id="quitterP4" type="button">Retour</button>
+    </div>
+    <div class="scores-ligne" id="difficultesP4"></div>
+    <div class="grille-p4" id="grilleP4"></div>
+    <p class="jeu-message" id="messageP4"></p>
+    <p class="jeu-aide">Clic sur une colonne pour y laisser tomber ton jeton, ou les touches 1 a 7. Aligne quatre jetons lime avant l'adversaire. Retour arriere ou Annuler pour reprendre ton coup. N : nouvelle partie. Echap : quitter.</p>
+  </section>
+
+  <!-- Plateformer, bac a sable (code 8888, hors menu) -->
+  <section class="jeu jeu-tanukiland" id="jeuPlateformer" hidden>
+    <div class="jeu-entete entete-tanukiland">
+      <span class="jeu-score">Vies <strong id="viesTanukiland">3</strong></span>
+      <span class="jeu-score">Feuilles <strong id="feuillesTanukiland">0</strong></span>
+      <span class="jeu-score score-principal">Score <strong class="valeur-score" id="scoreTanukiland">0</strong></span>
+      <span class="jeu-score">Temps <strong id="tempsTanukiland">300</strong></span>
+      <span class="jeu-score">Niveau <strong id="niveauTanukiland">1-1</strong></span>
+      <button class="jeu-quitter" id="quitterPlateformer" type="button">Retour</button>
+    </div>
+    <span class="indicateur-test" id="testTanukiland" hidden>Mode test</span>
+    <div class="scene-plateformer">
+      <canvas id="canvasPlateformer" width="640" height="384"></canvas>
+      <aside class="reglages-plateformer" id="reglagesPlateformer" hidden></aside>
+    </div>
+    <div class="commandes-tactiles" id="tactilesTanukiland" hidden>
+      <button class="bouton-tactile" id="tactileGauche" type="button">Gauche</button>
+      <button class="bouton-tactile" id="tactileDroite" type="button">Droite</button>
+      <button class="bouton-tactile bouton-saut" id="tactileSaut" type="button">Saut</button>
+      <button class="bouton-tactile" id="tactilePrendre" type="button">Prendre</button>
+    </div>
+    <p class="jeu-message" id="messagePlateformer"></p>
+    <p class="jeu-aide">Fleches ou QD pour courir, Espace ou Haut pour sauter. Maintenir le saut le fait durer. Saute sur les yokai pour les ecarter. Maj : ramasser une carapace, relacher pour la lancer. P ou Echap : pause.</p>
+  </section>
+
+  <!-- Classements lateraux, sur grand ecran seulement -->
+  <aside class="panneau-classement panneau-local" id="panneauClassementLocal">
+    <span class="tetris-label">Sur cet appareil</span>
+    <ol class="classement-liste" id="classementListeLocale"></ol>
+    <p class="classement-rang" id="classementRangLocal"></p>
+  </aside>
+  <aside class="panneau-classement panneau-en-ligne" id="panneauClassementEnLigne">
+    <span class="tetris-label">Classement en ligne</span>
+    <ol class="classement-liste" id="classementListeEnLigne"></ol>
+    <p class="classement-rang" id="classementRangEnLigne"></p>
+  </aside>
+
   <!-- Menu arcade (code 1337, ou appui long sur le titre) -->
-  <div class="overlay menu-arcade" id="menuArcade" hidden>
-    <h2 class="overlay-titre">Arcade</h2>
-    <ul class="menu-liste" id="menuListe"></ul>
-    <div class="scores-ligne">
+  <div class="overlay menu-arcade" id="menuArcade" hidden role="dialog" aria-modal="true" aria-labelledby="menuTitre">
+    <header class="menu-entete">
+      <div>
+        <h2 class="overlay-titre" id="menuTitre">Arcade</h2>
+        <p class="menu-sous-titre"><span lang="ja">ゲームセンター</span><span id="menuProgression"></span></p>
+      </div>
+      <button class="jeu-quitter" id="menuFermer" type="button">Calculatrice</button>
+    </header>
+    <div class="menu-progression" aria-hidden="true"><span id="menuJauge"></span></div>
+    <ul class="menu-grille" id="menuListe"></ul>
+    <div class="scores-ligne menu-pied">
       <button class="jeu-quitter" id="menuSuggestion" type="button">Proposer une idee</button>
-      <a class="jeu-quitter lien-bouton" href="https://ko-fi.com/B0B31Z3AVY" target="_blank" rel="noopener">Offrir un cafe</a>
-      <button class="jeu-quitter" id="menuFermer" type="button">Fermer</button>
+      <a class="jeu-quitter lien-bouton" href="https://ko-fi.com/B0B31Z3AVY" target="_blank" rel="noopener">Offrir un caf&eacute;</a>
+    </div>
+  </div>
+
+  <!-- Ecran titre : l'ecran de la calculatrice qui s'ouvre sur le jeu -->
+  <div class="carte-titre" id="carteTitre" hidden aria-live="assertive">
+    <div class="carte-contenu">
+      <p class="carte-code" id="carteCode"></p>
+      <p class="carte-jp" id="carteJp" lang="ja"></p>
+      <h2 class="carte-nom" id="carteNom"></h2>
+      <p class="carte-pitch" id="cartePitch"></p>
+      <div class="carte-classements">
+        <div class="carte-bloc">
+          <span class="carte-etiquette" id="carteTopTitre">Classement mondial</span>
+          <ol class="carte-top" id="carteTop"></ol>
+        </div>
+        <div class="carte-bloc carte-toi">
+          <span class="carte-etiquette">Ton record</span>
+          <strong class="carte-perso" id="cartePerso"></strong>
+          <span class="carte-rang" id="carteRang"></span>
+        </div>
+      </div>
+      <p class="carte-invite"><span class="invite-clavier"><kbd>Entr&eacute;e</kbd> pour jouer</span><span class="invite-tactile">Touche l'&eacute;cran pour jouer</span></p>
     </div>
   </div>
 
@@ -267,21 +502,10 @@
     </div>
     <div class="scores-ligne">
       <button class="jeu-quitter" id="scoresRejouer" type="button">Rejouer</button>
-      <button class="jeu-quitter" id="scoresQuitter" type="button">Quitter</button>
+      <button class="jeu-quitter" id="scoresQuitter" type="button">Autres jeux</button>
     </div>
   </div>
 
-  <script src="js/arcade.js"></script>
-  <script src="js/classement.js"></script>
-  <script src="js/calculatrice.js"></script>
-  <script src="js/snake.js"></script>
-  <script src="js/tetris.js"></script>
-  <script src="js/jeu-2048.js"></script>
-  <script src="js/solitaire.js"></script>
-  <script src="js/blackjack.js"></script>
-  <script src="js/casse-briques.js"></script>
-  <script src="js/sudoku.js"></script>
-  <script src="js/invaders.js"></script>
-  <script src="js/mahjong.js"></script>
+  <script type="module" src="js/main.js"></script>
 </body>
 </html>

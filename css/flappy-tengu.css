@@ -1,0 +1,42 @@
+/* =====================================================================
+   FLAPPY TENGU
+   Ecran vertical de 360 x 640 logiques. La taille du canvas est
+   calculee en JS (panneaux lateraux, manette) et le dessin suit la
+   resolution reelle de l'ecran.
+   ===================================================================== */
+
+.jeu-flappy {
+  gap: 8px;
+}
+
+.entete-flappy {
+  max-width: 96vw;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+
+.entete-boutons-flappy {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+#canvasFlappy {
+  display: block;
+  max-width: 96vw;
+  background-color: #0b0d16;
+  border: 1px solid var(--bord-fort);
+  border-radius: 10px;
+  touch-action: none;
+  cursor: pointer;
+}
+
+@media (max-width: 560px) {
+  .entete-flappy .jeu-score strong {
+    font-size: 1.4rem;
+  }
+
+  .entete-flappy .jeu-score.score-principal .valeur-score {
+    font-size: 1.8rem;
+  }
+}

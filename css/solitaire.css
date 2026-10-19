@@ -1,0 +1,114 @@
+/* =====================================================================
+   SOLITAIRE - billes de verre sur plateau de bois tourne
+   ===================================================================== */
+
+.jeu-solitaire {
+  --cote-solitaire: min(94vw, calc(100vh - 260px), 520px);
+  --cote-solitaire: min(94vw, calc(100dvh - 260px), 520px);
+  gap: 10px;
+}
+
+/* Pas de selection ni de loupe sur un appui long */
+.jeu-solitaire canvas,
+.jeu-solitaire .entete-solitaire {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.entete-solitaire {
+  width: max(var(--cote-solitaire), min(94vw, 460px));
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+
+.boutons-solitaire {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.jeu-quitter:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* Choix du plateau, style local pour ne dependre d'aucun autre jeu */
+.plateaux-solitaire .difficulte.active {
+  color: var(--fond);
+  background-color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* Taille calculee en JS selon la place restante, rendu net */
+#canvasSolitaire {
+  display: block;
+  max-width: 96vw;
+  border-radius: 10px;
+  touch-action: none;
+  cursor: pointer;
+}
+
+@media (max-width: 560px) {
+  .entete-solitaire .jeu-score strong {
+    font-size: 1.5rem;
+  }
+
+  .entete-solitaire .jeu-score.score-principal .valeur-score {
+    font-size: 1.9rem;
+  }
+
+  .boutons-solitaire {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .plateaux-solitaire .jeu-quitter {
+    padding: 6px 8px;
+    font-size: 0.6rem;
+  }
+}
+
+/* Partagee par tous les jeux : la ligne de message sous le plateau */
+.jeu-message {
+  font-family: var(--police-affichage);
+  font-stretch: var(--etroit);
+  font-weight: 700;
+  font-size: 1.4rem;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  min-height: 1.4em;
+}
+
+.jeu-solitaire .jeu-message {
+  font-family: var(--police-texte);
+  font-stretch: normal;
+  font-weight: 500;
+  font-size: 0.9rem;
+  letter-spacing: 0;
+  color: var(--texte-sourd);
+  text-align: center;
+  max-width: var(--cote-solitaire);
+}
+
+/* Telephone : tout tient au-dessus de la manette */
+@media (max-width: 560px) {
+  .entete-solitaire {
+    gap: 4px 10px;
+  }
+
+  .boutons-solitaire .jeu-quitter {
+    padding: 6px 8px;
+    font-size: 0.58rem;
+  }
+
+  .plateaux-solitaire {
+    gap: 4px;
+  }
+
+  .jeu-solitaire .jeu-message {
+    min-height: 1.1em;
+    font-size: 0.8rem;
+  }
+}

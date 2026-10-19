@@ -1,0 +1,28 @@
+/* =====================================================================
+   FLIPPER
+   La taille du canvas est calculee en JS : panneau a droite sur grand
+   ecran, panneau en haut sur telephone. Le score vit dans le panneau.
+   ===================================================================== */
+
+.jeu-matsuri {
+  gap: 8px;
+}
+
+.entete-matsuri {
+  width: min(96vw, 1100px);
+  justify-content: flex-end;
+}
+
+/* Le panneau du flipper affiche deja score, bille et niveau */
+.entete-matsuri .jeu-score {
+  display: none;
+}
+
+#canvasMatsuri {
+  display: block;
+  max-width: 96vw;
+  background-color: #0b0b10;
+  border: 1px solid var(--bord-fort);
+  border-radius: 8px;
+  touch-action: none;
+}

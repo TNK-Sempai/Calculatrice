@@ -1,0 +1,80 @@
+/* =====================================================================
+   PUISSANCE 4 - daruma contre oni
+   Le plateau est dessine dans un canvas de 480 sur 520 logiques. Sa
+   taille a l'ecran est calculee en JS (place restante, manette mesuree).
+   ===================================================================== */
+
+.jeu-puissance4 {
+  gap: 8px;
+}
+
+.entete-p4 {
+  width: min(94vw, 720px);
+  flex-wrap: wrap;
+  gap: 8px 14px;
+}
+
+.entete-boutons-p4 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+}
+
+#canvasP4 {
+  display: block;
+  max-width: 96vw;
+  border-radius: 12px;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  cursor: pointer;
+}
+
+/* Pendant la reflexion de l'IA, le plateau ne repond plus */
+#canvasP4.reflexion {
+  cursor: wait;
+}
+
+.jeu-puissance4 .jeu-message {
+  min-height: 1.4em;
+  font-family: var(--police-texte);
+  font-size: 0.9rem;
+  color: var(--texte);
+}
+
+.stats-p4 {
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  color: var(--texte-sourd);
+  text-align: center;
+  max-width: min(92vw, 560px);
+}
+
+@media (max-width: 560px) {
+  .entete-p4 .jeu-score strong {
+    font-size: 1.5rem;
+  }
+
+  .entete-p4 .jeu-score.score-principal .valeur-score {
+    font-size: 1.9rem;
+  }
+
+  .entete-boutons-p4 {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .entete-boutons-p4 .jeu-quitter {
+    padding: 7px 9px;
+  }
+
+  .jeu-puissance4 .jeu-aide {
+    display: none;
+  }
+
+  .jeu-puissance4 .stats-p4 {
+    margin-bottom: auto;
+  }
+}

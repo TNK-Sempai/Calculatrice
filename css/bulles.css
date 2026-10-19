@@ -1,0 +1,31 @@
+/* =====================================================================
+   BUBBLE SHOOTER
+   Le canvas est dimensionne en JS (480 x 780 logiques, net a toute
+   resolution). L'en-tete ne garde que les boutons : niveau, objectif et
+   score sont dessines dans le jeu.
+   ===================================================================== */
+
+.jeu-bulles {
+  gap: 8px;
+}
+
+.entete-bulles {
+  width: min(96vw, 560px);
+  justify-content: flex-end;
+}
+
+.bulles-boutons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+}
+
+#canvasBulles {
+  display: block;
+  max-width: 96vw;
+  border-radius: 14px;
+  border: 1px solid var(--bord-fort);
+  touch-action: none;
+  cursor: crosshair;
+}

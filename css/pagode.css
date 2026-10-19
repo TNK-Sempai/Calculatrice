@@ -1,0 +1,29 @@
+/* =====================================================================
+   STACK (pagode)
+   Le canvas est dimensionne en JS (400 x 640 logiques, net a toute
+   resolution). Score et record sont dessines dans le jeu.
+   ===================================================================== */
+
+.jeu-pagode {
+  gap: 8px;
+}
+
+.entete-pagode {
+  width: min(96vw, 520px);
+  justify-content: flex-end;
+}
+
+.entete-boutons-pagode {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+#canvasPagode {
+  display: block;
+  max-width: 96vw;
+  border: 1px solid var(--bord-fort);
+  border-radius: 12px;
+  touch-action: none;
+  cursor: pointer;
+}

@@ -1,0 +1,545 @@
+/* =====================================================================
+   MOTUS
+   Le plateau de la tele : un cadre marine, des cases bleues, le carre
+   rouge des lettres bien placees, le rond jaune des mal placees. Les
+   tailles (--case, --touche-h) sont calculees en JS pour que tout
+   tienne au-dessus de la manette.
+   ===================================================================== */
+
+.jeu-motus {
+  gap: 8px;
+  --largeur-motus: min(94vw, 520px);
+  --case: 54px;
+  --touche-h: 50px;
+  --bleu-motus: #1f4fb4;
+  --bleu-motus-clair: #3d6fd6;
+  --bleu-motus-sombre: #143581;
+  --rouge-motus: #d8261c;
+  --jaune-motus: #f4c20d;
+}
+
+.entete-motus {
+  width: var(--largeur-motus);
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+
+.motus-boutons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.jeu-motus #longueursMotus .jeu-quitter {
+  padding: 4px 10px;
+}
+
+/* ===== Plateau ===== */
+.motus-plateau {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px 14px;
+  background: linear-gradient(180deg, #0c1d4a 0%, #08153a 100%);
+  border: 3px solid #f4c20d;
+  border-radius: 14px;
+  box-shadow: 0 0 0 4px #0a1430, 0 12px 26px rgba(0, 0, 0, 0.45);
+}
+
+.motus-bandeau {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  padding: 0 2px;
+}
+
+.motus-logo {
+  font-family: var(--police-affichage);
+  font-weight: 900;
+  font-stretch: 85%;
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+  color: var(--jaune-motus);
+}
+
+.motus-info {
+  font-family: var(--police-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  color: #c8d6f6;
+}
+
+/* Le plateau s'eclaire d'un coup a chaque nouveau mot */
+.motus-plateau.nouveau .motus-grille {
+  animation: motus-allume 0.45s ease-out;
+}
+
+@keyframes motus-allume {
+  from { opacity: 0.2; transform: scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Chrono par mot */
+.motus-chrono {
+  position: relative;
+  width: 100%;
+  height: 8px;
+  background: #0a1430;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.motus-chrono[hidden] {
+  display: none;
+}
+
+.motus-chrono span {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: var(--jaune-motus);
+  transition: width 1s linear;
+}
+
+.motus-chrono.presse span {
+  background: var(--rouge-motus);
+}
+
+/* ===== Grille ===== */
+.motus-grille {
+  --colonnes: 6;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.motus-rangee {
+  display: flex;
+  gap: 6px;
+}
+
+/* Le mot refuse tremble : un mouvement qui dit "non" */
+.motus-rangee.refus {
+  animation: motus-refus 0.3s steps(6, end);
+}
+
+@keyframes motus-refus {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+.motus-case {
+  width: var(--case);
+  height: var(--case);
+  display: grid;
+  place-items: center;
+  position: relative;
+  background: var(--bleu-motus);
+  border-radius: calc(var(--case) * 0.1);
+  box-shadow: inset 0 2px 0 var(--bleu-motus-clair), inset 0 -3px 0 var(--bleu-motus-sombre);
+  font-family: var(--police-affichage);
+  font-weight: 800;
+  font-stretch: 90%;
+  font-size: calc(var(--case) * 0.58);
+  line-height: 1;
+  color: #ffffff;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+.motus-case b {
+  position: relative;
+  z-index: 1;
+  font-weight: inherit;
+}
+
+/* Rangee en cours : un peu plus claire, la lettre a taper soulignee */
+.motus-case.courante {
+  background: #2758c4;
+}
+
+.motus-case.indice {
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.motus-case.curseur::after {
+  content: "";
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  bottom: 14%;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--jaune-motus);
+  animation: motus-clignote 1s steps(2, start) infinite;
+}
+
+@keyframes motus-clignote {
+  to { visibility: hidden; }
+}
+
+/* Une lettre tapee s'enfonce un instant */
+.motus-case.frappe {
+  animation: motus-frappe 0.12s ease-out;
+}
+
+@keyframes motus-frappe {
+  50% { transform: scale(1.08); }
+}
+
+/* Retournement : la case pivote, sa couleur change a mi-chemin */
+.motus-case.retourne {
+  animation: motus-retourne 0.32s ease-in-out;
+}
+
+@keyframes motus-retourne {
+  0% { transform: rotateX(0); }
+  50% { transform: rotateX(90deg); }
+  100% { transform: rotateX(0); }
+}
+
+.motus-case.revelee.absente {
+  background: var(--bleu-motus-sombre);
+  box-shadow: inset 0 2px 0 #1d438f, inset 0 -3px 0 #0e2763;
+  color: #9fb4e4;
+}
+
+.motus-case.revelee.placee {
+  background: var(--rouge-motus);
+  box-shadow: inset 0 2px 0 #f0574d, inset 0 -3px 0 #8f150e;
+}
+
+/* Le rond jaune dans la case bleue, comme a la tele */
+.motus-case.revelee.presente::before {
+  content: "";
+  position: absolute;
+  inset: 7%;
+  border-radius: 50%;
+  background: var(--jaune-motus);
+  box-shadow: inset 0 -3px 0 #b88c00;
+}
+
+.motus-case.revelee.presente {
+  color: #1a1410;
+}
+
+/* La solution d'un mot rate s'inscrit en rouge vif */
+.motus-case.solution {
+  background: #0a1430;
+  box-shadow: inset 0 0 0 2px var(--rouge-motus);
+  color: var(--rouge-motus);
+  animation: motus-retourne 0.32s ease-in-out;
+}
+
+/* Le mot trouve saute en vague */
+.motus-rangee.gagnee .motus-case {
+  animation: motus-vague 0.5s ease-out both;
+}
+
+.motus-rangee.gagnee .motus-case:nth-child(2) { animation-delay: 0.05s; }
+.motus-rangee.gagnee .motus-case:nth-child(3) { animation-delay: 0.1s; }
+.motus-rangee.gagnee .motus-case:nth-child(4) { animation-delay: 0.15s; }
+.motus-rangee.gagnee .motus-case:nth-child(5) { animation-delay: 0.2s; }
+.motus-rangee.gagnee .motus-case:nth-child(6) { animation-delay: 0.25s; }
+.motus-rangee.gagnee .motus-case:nth-child(7) { animation-delay: 0.3s; }
+.motus-rangee.gagnee .motus-case:nth-child(8) { animation-delay: 0.35s; }
+
+@keyframes motus-vague {
+  30% { transform: translateY(-22%); }
+  60% { transform: translateY(4%); }
+  100% { transform: none; }
+}
+
+/* ===== Message ===== */
+.motus-message {
+  min-height: 1.4em;
+  margin: 0;
+  font-family: var(--police-texte);
+  font-size: 0.9rem;
+  color: var(--texte-sourd);
+  text-align: center;
+}
+
+.motus-message[data-ton="alerte"] {
+  color: #ff7466;
+}
+
+.motus-message[data-ton="succes"] {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* ===== Clavier ===== */
+.motus-clavier {
+  width: var(--largeur-motus);
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.motus-ligne-clavier {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
+.motus-touche {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 46px;
+  height: var(--touche-h);
+  display: grid;
+  place-items: center;
+  padding: 0;
+  font-family: var(--police-affichage);
+  font-weight: 800;
+  font-size: calc(var(--touche-h) * 0.36);
+  color: #1d2147;
+  background: #e8ecf8;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 3px 0 #9aa3c4;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 0.06s, box-shadow 0.06s;
+}
+
+.motus-touche:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #9aa3c4;
+}
+
+.motus-touche.large {
+  flex: 1.6 1 0;
+  max-width: 76px;
+  font-family: var(--police-mono);
+  font-size: calc(var(--touche-h) * 0.24);
+  letter-spacing: 0.02em;
+}
+
+.motus-touche svg {
+  width: 46%;
+  height: 46%;
+}
+
+.motus-touche.valider {
+  color: #1a1410;
+  background: var(--accent);
+  box-shadow: 0 3px 0 #6c8a2a;
+}
+
+.motus-touche.placee {
+  color: #fff;
+  background: var(--rouge-motus);
+  box-shadow: 0 3px 0 #8f150e;
+}
+
+.motus-touche.presente {
+  color: #1a1410;
+  background: var(--jaune-motus);
+  box-shadow: 0 3px 0 #b88c00;
+}
+
+.motus-touche.absente {
+  color: #6b7398;
+  background: #2a2f4e;
+  box-shadow: 0 3px 0 #171a2e;
+}
+
+/* Touche visee par la croix de la manette */
+.motus-touche.vise {
+  outline: 3px solid var(--accent);
+  outline-offset: 1px;
+}
+
+@media (pointer: fine) {
+  .motus-touche.vise {
+    outline: none;
+  }
+}
+
+/* ===== Statistiques ===== */
+.motus-stats {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  background: rgba(8, 21, 58, 0.82);
+  border-radius: 12px;
+}
+
+.motus-stats[hidden] {
+  display: none;
+}
+
+.stats-boite {
+  width: min(100%, 380px);
+  padding: 14px 16px;
+  background: #f4f1e8;
+  border: 3px solid var(--jaune-motus);
+  border-radius: 12px;
+  color: #1d2147;
+  animation: motus-allume 0.3s ease-out;
+}
+
+.stats-boite h3 {
+  margin: 0 0 10px;
+  font-family: var(--police-affichage);
+  font-size: 1.2rem;
+  color: var(--rouge-motus);
+  text-align: center;
+}
+
+.stats-chiffres {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  text-align: center;
+  font-family: var(--police-mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.04em;
+  color: #59608a;
+}
+
+.stats-chiffres strong {
+  display: block;
+  font-family: var(--police-affichage);
+  font-size: 1.4rem;
+  color: #1d2147;
+}
+
+.stats-titre {
+  margin: 12px 0 6px;
+  font-family: var(--police-texte);
+  font-size: 0.78rem;
+  color: #59608a;
+}
+
+.stats-barres {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stats-ligne {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--police-mono);
+  font-size: 0.72rem;
+}
+
+.stats-ligne > span {
+  width: 1ch;
+}
+
+.stats-barre {
+  min-width: 18px;
+  padding: 2px 6px;
+  text-align: right;
+  color: #fff;
+  background: var(--bleu-motus);
+  border-radius: 3px;
+  box-sizing: border-box;
+}
+
+.stats-barre.derniere {
+  background: var(--rouge-motus);
+}
+
+.stats-boutons {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.stats-boite .jeu-quitter {
+  color: #1d2147;
+  border-color: #1d2147;
+}
+
+.stats-boite .jeu-quitter.active {
+  color: #fff;
+  background: var(--rouge-motus);
+  border-color: var(--rouge-motus);
+}
+
+@media (max-width: 560px) {
+  .jeu-motus #longueursMotus {
+    gap: 4px;
+  }
+
+  .jeu-motus #longueursMotus .jeu-quitter {
+    padding: 3px 6px;
+    font-size: 0.62rem;
+  }
+
+  .motus-plateau {
+    padding: 6px 8px 10px;
+    gap: 6px;
+  }
+
+  .motus-boutons {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .motus-touche {
+    border-radius: 6px;
+  }
+
+  .motus-ligne-clavier {
+    gap: 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motus-case.retourne,
+  .motus-case.solution,
+  .motus-rangee.gagnee .motus-case,
+  .motus-plateau.nouveau .motus-grille {
+    animation: none;
+  }
+}
+
+/* Petits ecrans en hauteur (telephone avec la manette) : tout se resserre
+   pour laisser la place aux cases */
+@media (max-height: 720px) {
+  .jeu-motus {
+    gap: 4px;
+  }
+
+  .jeu-motus .jeu-entete .jeu-quitter,
+  .jeu-motus #longueursMotus .jeu-quitter {
+    padding: 2px 7px;
+    font-size: 0.6rem;
+    min-height: 0;
+  }
+
+  .jeu-motus #longueursMotus {
+    gap: 3px;
+  }
+
+  .motus-bandeau {
+    display: none;
+  }
+
+  .motus-message:empty {
+    min-height: 0;
+  }
+
+  .motus-clavier {
+    gap: 5px;
+  }
+}

@@ -1,0 +1,196 @@
+/* =====================================================================
+   TETRIS
+   Le plateau est pose dans un cadre de borne : un liseré clair en haut,
+   un socle plus sombre, et les deux colonnes Hold / Next de part et
+   d'autre. Tout se dimensionne depuis la hauteur du plateau, que
+   tetris.js recalcule (fenetre, manette, aide) dans --hauteur-plateau.
+   ===================================================================== */
+
+.jeu-tetris {
+  --hauteur-plateau: min(
+    calc(100vh - 150px - var(--hauteur-manette, 0px)),
+    calc(100dvh - 150px - var(--hauteur-manette, 0px)),
+    calc((100vw - 64px) * 10 / 9)
+  );
+  gap: 12px;
+}
+
+.tetris-zone {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+
+
+/* Le cadre de borne autour du puits : une laque sombre, un liseré
+   clair en haut et un socle plus epais en bas */
+.tetris-cadre {
+  padding: 5px;
+  background: linear-gradient(180deg, #2a2b3d 0%, #1a1b28 60%, #14151f 100%);
+  border: 1px solid #3c3d52;
+  border-top-color: #57586f;
+  border-bottom-width: 4px;
+  border-bottom-color: #0d0d14;
+  border-radius: 12px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 6px 0 rgba(0, 0, 0, 0.35);
+  line-height: 0;
+}
+
+#canvasTetris {
+  display: block;
+  height: var(--hauteur-plateau);
+  width: calc(var(--hauteur-plateau) / 2);
+  background-color: #07070c;
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px #0a0a10;
+  touch-action: none;
+}
+
+.tetris-cote {
+  width: var(--largeur-cote, calc(var(--hauteur-plateau) / 5));
+  min-width: 58px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.tetris-panneau {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tetris-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--texte-sourd);
+}
+
+#canvasHold,
+#canvasNext {
+  display: block;
+  width: 100%;
+  height: auto;
+  background-color: #13141e;
+  border: 1px solid #3c3d52;
+  border-top-color: #57586f;
+  border-radius: 10px;
+}
+
+#canvasHold {
+  aspect-ratio: 1 / 1;
+}
+
+#canvasNext {
+  aspect-ratio: 120 / 420;
+}
+
+.tetris-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tetris-stats strong {
+  font-family: var(--police-affichage);
+  font-stretch: var(--etroit);
+  font-weight: 700;
+  font-size: clamp(1rem, min(calc(var(--hauteur-plateau) / 15), calc(var(--largeur-cote, 200px) * 0.3)), 2.3rem);
+  line-height: 1;
+  color: var(--texte);
+  margin-bottom: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Le score (ou le chrono du sprint) est la seule valeur en lime */
+.tetris-stats .valeur-score {
+  color: var(--accent);
+  font-size: clamp(1.1rem, min(calc(var(--hauteur-plateau) / 12), calc(var(--largeur-cote, 200px) * 0.3)), 2.8rem);
+  white-space: nowrap;
+}
+
+/* Le taux de Tetris se place a cote du compteur de lignes */
+.tetris-duo {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.tetris-taux {
+  font-family: var(--police-mono);
+  font-style: normal;
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  color: var(--texte-sourd);
+}
+
+.tetris-message {
+  font-family: var(--police-affichage);
+  font-stretch: var(--etroit);
+  font-weight: 700;
+  font-size: clamp(1rem, calc(var(--hauteur-plateau) / 18), 1.8rem);
+  line-height: 1.1;
+  color: var(--accent);
+  min-height: 2.4em;
+}
+
+.tetris-boutons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tetris-boutons .jeu-quitter {
+  flex: 1 1 0;
+  min-width: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+/* Le Tetris occupe deja ses deux cotes : les classements se glissent sous
+   les panneaux Hold et Next plutot que d'ajouter deux colonnes. */
+.tetris-cote .panneau-classement.dans-le-jeu .classement-liste li {
+  font-size: 0.6rem;
+  padding: 1px 2px;
+}
+
+.tetris-cote .panneau-classement.dans-le-jeu .classement-rang {
+  font-size: 0.56rem;
+}
+
+/* Sur telephone, les colonnes laterales se resserrent */
+@media (max-width: 560px) {
+  .tetris-zone {
+    gap: 8px;
+  }
+
+  .tetris-cote {
+    gap: 10px;
+  }
+
+  .tetris-label {
+    font-size: 0.5rem;
+    letter-spacing: 0.08em;
+  }
+
+  .tetris-boutons {
+    flex-direction: column;
+  }
+
+  .tetris-boutons .jeu-quitter {
+    flex: none;
+    padding: 6px 4px;
+    font-size: 0.56rem;
+  }
+
+  .jeu-tetris .jeu-aide {
+    display: none;
+  }
+
+  /* L'aide masquee, le plateau reste centre quand meme */
+  .jeu-tetris .tetris-zone {
+    margin-bottom: auto;
+  }
+}

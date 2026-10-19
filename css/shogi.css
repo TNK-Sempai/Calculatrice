@@ -1,0 +1,75 @@
+/* =====================================================================
+   SHOGI 将棋
+   ===================================================================== */
+
+.jeu-shogi {
+  gap: 10px;
+}
+
+.entete-shogi {
+  width: min(96vw, 620px);
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+
+.entete-shogi .entete-boutons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.jeu-shogi .jeu-quitter:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* Le bouton Noms reste allume quand l'aide en lettres est active */
+.jeu-shogi .jeu-quitter[aria-pressed="true"] {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+#canvasShogi {
+  display: block;
+  max-width: 96vw;
+  border-radius: 12px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.jeu-shogi .jeu-message {
+  font-family: var(--police-texte);
+  font-size: 0.9rem;
+  color: var(--texte);
+  text-align: center;
+  min-height: 1.4em;
+  max-width: min(94vw, 560px);
+}
+
+@media (max-width: 560px) {
+  .entete-shogi .entete-boutons {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .entete-shogi .jeu-quitter {
+    padding: 7px 9px;
+  }
+}
+
+/* Petit telephone : en-tete serre, pour laisser la place au plateau */
+@media (max-width: 420px) {
+  .entete-shogi { gap: 4px 8px; }
+  .entete-shogi .jeu-score strong { font-size: 1.15rem; }
+  .entete-shogi .entete-boutons { gap: 4px; }
+  .entete-shogi .jeu-quitter,
+  #jeuShogi .scores-ligne button { padding: 4px 7px; font-size: 0.56rem; }
+  .jeu-shogi .jeu-message { font-size: 0.8rem; }
+}
+
+/* Tres petit ecran : les six boutons tiennent sur une ligne */
+@media (max-width: 360px) {
+  .entete-shogi .jeu-quitter { padding: 4px 5px; letter-spacing: 0; }
+  .entete-shogi .jeu-score.score-principal .valeur-score { font-size: 1.6rem; }
+}

@@ -1,0 +1,691 @@
+/* =====================================================================
+   SUDOKU DU SANCTUAIRE
+   Un carnet japonais relie au fil : couverture de toile indigo, feuille
+   de papier creme, chiffres imprimes a l'encre de Chine. Le joueur
+   ecrit au stylo bleu nuit, et ses notes au crayon gris.
+   ===================================================================== */
+
+/* Partagee par tous les jeux qui ont des boutons de difficulte
+   (demineur, dames, puissance 4, pong) : ne pas retirer. */
+.difficulte.active {
+  color: var(--fond);
+  background-color: var(--accent);
+  border-color: var(--accent);
+}
+
+.jeu-sudoku {
+  --cote-sudoku: 480px;
+  --papier-sudoku: #f3ecdb;
+  --papier-lie: #e7dfc9;
+  --surligne: #f4dc7a;
+  --surligne-pale: #f7eab4;
+  --encre-sudoku: #1d1c22;
+  --encre-stylo: #24396b;
+  --encre-crayon: #77736a;
+  --trait-fin: #cfc4ab;
+  --toile: #2c3754;
+  --toile-sombre: #1d253b;
+  gap: 10px;
+}
+
+.entete-sudoku {
+  width: min(94vw, 560px);
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+
+.entete-sudoku .entete-boutons {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+/* Deux erreurs sur trois : le compteur passe au vermillon */
+.sudoku-erreurs.alerte strong {
+  color: #ff7466;
+}
+
+.sudoku-modes .mode-jour {
+  border-color: rgba(200, 55, 45, 0.6);
+  color: #e0574b;
+}
+
+.sudoku-modes .mode-jour.active {
+  color: var(--texte);
+  background-color: var(--vermillon);
+  border-color: var(--vermillon);
+}
+
+/* ---------------------------------------------------------------------
+   Le carnet : couverture de toile, reliure cousue en haut
+   --------------------------------------------------------------------- */
+
+.sudoku-carnet {
+  position: relative;
+  padding: 26px 12px 12px;
+  background: linear-gradient(180deg, var(--toile) 0%, var(--toile-sombre) 100%);
+  border-radius: 6px 6px 8px 8px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.3),
+    0 6px 0 #141a2a,
+    0 10px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Yotsume toji : quatre points de couture, le fil passe par-dessus le dos */
+.sudoku-reliure {
+  position: absolute;
+  top: 2px;
+  left: 12px;
+  right: 12px;
+  height: 22px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.35);
+}
+
+.sudoku-reliure i {
+  position: relative;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #10141f;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.sudoku-reliure i::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: -6px;
+  width: 3px;
+  height: 9px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #c9b98f, #efe3c2 50%, #b4a378);
+}
+
+/* Le fil court aussi d'un point au suivant, le long du dos */
+.sudoku-reliure::before {
+  content: "";
+  position: absolute;
+  left: 12.5%;
+  right: 12.5%;
+  top: 2px;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #efe3c2, #b4a378);
+}
+
+/* La feuille : papier creme, legere ombre de la page en dessous */
+.sudoku-feuille {
+  padding: 8px;
+  background-color: var(--papier-sudoku);
+  border-radius: 2px;
+  box-shadow:
+    0 2px 0 #d8cdb3,
+    0 4px 0 #c6b998;
+}
+
+.grille-sudoku {
+  width: var(--cote-sudoku);
+  height: var(--cote-sudoku);
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  grid-template-rows: repeat(9, 1fr);
+  border: 2px solid var(--encre-sudoku);
+  background-color: var(--papier-sudoku);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.case-sudoku {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  border-right: 1px solid var(--trait-fin);
+  border-bottom: 1px solid var(--trait-fin);
+  font-family: var(--police-affichage);
+  font-weight: 700;
+  font-stretch: 85%;
+  font-size: calc(var(--cote-sudoku) / 15);
+  line-height: 1;
+  color: var(--encre-sudoku);
+  cursor: pointer;
+  transition: background-color 0.12s;
+}
+
+.case-sudoku:nth-child(9n) {
+  border-right: none;
+}
+
+.case-sudoku:nth-last-child(-n + 9) {
+  border-bottom: none;
+}
+
+/* Les traits epais a l'encre qui separent les blocs */
+.case-sudoku.bord-droit {
+  border-right: 2px solid var(--encre-sudoku);
+}
+
+.case-sudoku.bord-bas {
+  border-bottom: 2px solid var(--encre-sudoku);
+}
+
+/* Chiffres ecrits a la main : chaque case penche a sa facon */
+.manuscrit {
+  width: 46%;
+  height: 72%;
+  overflow: visible;
+  transform: translate(var(--decal, 0), 0) rotate(var(--incl, 0deg));
+}
+
+.manuscrit path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.case-sudoku.saisie {
+  color: var(--encre-stylo);
+}
+
+/* Le chiffre qui vient d'etre ecrit se trace en un geste */
+.case-sudoku.pose .manuscrit path {
+  stroke-dasharray: 1;
+  animation: sudoku-trace 0.24s ease-out both;
+}
+
+@keyframes sudoku-trace {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Surlignage : la ligne, la colonne et le bloc en lavis, les memes
+   chiffres au surligneur */
+.case-sudoku.liee {
+  background-color: var(--papier-lie);
+}
+
+.case-sudoku.identique {
+  background-color: var(--surligne-pale);
+}
+
+.case-sudoku.selectionnee {
+  background-color: var(--surligne);
+  box-shadow: inset 0 0 0 2px var(--encre-stylo);
+}
+
+.case-sudoku.erreur {
+  color: var(--vermillon);
+  background-color: #f3d3c8;
+}
+
+/* Le chiffre faux est barre d'un trait de stylo */
+.case-sudoku.erreur::after {
+  content: "";
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  top: 50%;
+  height: 2px;
+  border-radius: 1px;
+  background-color: var(--vermillon);
+  transform: rotate(-24deg);
+}
+
+.case-sudoku.solution-montree {
+  color: var(--encre-crayon);
+}
+
+.case-sudoku.solution-montree .manuscrit path {
+  stroke-width: 1.7;
+}
+
+/* Les notes : une petite grille 3 x 3 de chiffres au crayon */
+.case-sudoku.notes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  padding: 2px;
+}
+
+.case-sudoku.notes span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  color: var(--encre-crayon);
+}
+
+.case-sudoku.notes .manuscrit {
+  width: 62%;
+  height: 78%;
+}
+
+.case-sudoku.notes .manuscrit path {
+  stroke-width: 2.6;
+}
+
+.case-sudoku.notes span.note-active {
+  color: var(--encre-stylo);
+  background-color: var(--surligne);
+  border-radius: 3px;
+}
+
+/* Une ligne, une colonne ou un bloc complete : un coup de surligneur
+   passe, en vague depuis la case jouee */
+.case-sudoku.acheve {
+  animation: sudoku-acheve 0.5s ease-out both;
+}
+
+@keyframes sudoku-acheve {
+  0% {
+    background-color: inherit;
+  }
+  35% {
+    background-color: var(--surligne);
+  }
+  100% {
+    background-color: inherit;
+  }
+}
+
+/* Un mauvais chiffre fait trembler la case */
+.case-sudoku.secousse {
+  animation: sudoku-secousse 0.3s ease-out;
+}
+
+@keyframes sudoku-secousse {
+  0%, 100% {
+    transform: none;
+  }
+  25% {
+    transform: translateX(-3px);
+  }
+  50% {
+    transform: translateX(3px);
+  }
+  75% {
+    transform: translateX(-2px);
+  }
+}
+
+/* ---------------------------------------------------------------------
+   Fin de grille : une fiche posee sur le carnet, tamponnee d'un sceau
+   --------------------------------------------------------------------- */
+
+.fin-sudoku {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 2;
+  width: min(86%, 340px);
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 18px 16px;
+  text-align: center;
+  color: var(--encre-sudoku);
+  background-color: #fbf6ea;
+  border: 1px solid #cdbf9f;
+  border-radius: 4px;
+  box-shadow: 0 4px 0 #d9ccad, 0 8px 0 rgba(0, 0, 0, 0.3);
+  animation: sudoku-fin 0.32s ease-out both;
+}
+
+.fin-sudoku[hidden] {
+  display: none;
+}
+
+.fin-sudoku strong {
+  font-family: var(--police-affichage);
+  font-weight: 800;
+  font-stretch: 85%;
+  font-size: 1.45rem;
+  line-height: 1.1;
+}
+
+.fin-sudoku > span:not(.sceau-sudoku):not(.fin-boutons-sudoku) {
+  font-family: var(--police-texte);
+  font-size: 0.9rem;
+  color: #514c43;
+}
+
+.fin-boutons-sudoku {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.fin-sudoku .jeu-quitter {
+  color: var(--encre-sudoku);
+  border-color: #b7a982;
+  background-color: #efe6d0;
+}
+
+.fin-sudoku #finNouvelleSudoku {
+  color: #fbf6ea;
+  border-color: var(--encre-stylo);
+  background-color: var(--encre-stylo);
+}
+
+/* Le sceau rouge, tamponne en biais */
+.sceau-sudoku {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  font-family: var(--police-jp);
+  font-weight: 700;
+  font-size: 1.15rem;
+  line-height: 1;
+  writing-mode: vertical-rl;
+  color: #fbf6ea;
+  background-color: #c0392b;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 3px #c0392b, inset 0 0 0 4px #fbf6ea;
+  transform: rotate(-8deg);
+  animation: sudoku-sceau 0.3s 0.2s ease-out both;
+}
+
+.fin-sudoku.perdu .sceau-sudoku {
+  background-color: #6b6559;
+  box-shadow: inset 0 0 0 3px #6b6559, inset 0 0 0 4px #fbf6ea;
+}
+
+@keyframes sudoku-fin {
+  from {
+    opacity: 0;
+    margin-top: 14px;
+  }
+  to {
+    opacity: 1;
+    margin-top: 0;
+  }
+}
+
+@keyframes sudoku-sceau {
+  0% {
+    opacity: 0;
+    transform: rotate(-8deg) scale(1.6);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(-8deg) scale(1);
+  }
+}
+
+/* ---------------------------------------------------------------------
+   Outils et pave
+   --------------------------------------------------------------------- */
+
+.sudoku-outils {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  width: min(94vw, 560px);
+}
+
+.outil-sudoku.active {
+  color: var(--fond);
+  background-color: var(--accent);
+  border-color: var(--accent);
+}
+
+.outil-sudoku:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* Pave numerique : chaque touche montre ce qu'il reste a poser */
+.pave-sudoku {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 6px;
+  width: min(94vw, 560px);
+}
+
+.touche-sudoku {
+  position: relative;
+  height: 50px;
+  display: grid;
+  place-items: center;
+  font-family: var(--police-affichage);
+  font-weight: 700;
+  font-stretch: 85%;
+  font-size: 1.5rem;
+  color: var(--texte);
+  background-color: var(--panneau-clair);
+  border: 1px solid var(--bord);
+  border-radius: var(--rayon);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  transition: background-color 0.12s, border-color 0.12s;
+}
+
+.touche-sudoku:hover {
+  border-color: var(--bord-fort);
+}
+
+.touche-sudoku:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+.touche-sudoku .reste {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-family: var(--police-mono);
+  font-weight: 400;
+  font-size: 0.5rem;
+  color: var(--texte-sourd);
+}
+
+.touche-sudoku.actif {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Tous les exemplaires poses : la touche s'efface */
+.touche-sudoku.epuise {
+  opacity: 0.3;
+}
+
+.touche-sudoku.effacer {
+  color: var(--accent);
+}
+
+/* En mode crayon, le pave ecrit en gris : on le voit d'un coup d'oeil */
+.jeu-sudoku.crayon .touche-sudoku:not(.effacer) .chiffre {
+  font-weight: 400;
+  color: #b9b4a8;
+}
+
+.jeu-sudoku .jeu-message {
+  min-height: 1.3em;
+  font-family: var(--police-texte);
+  font-size: 0.85rem;
+  color: var(--texte-sourd);
+  text-align: center;
+  max-width: min(94vw, 560px);
+}
+
+@media (max-width: 560px) {
+  .jeu-sudoku {
+    gap: 6px;
+  }
+
+  .entete-sudoku .jeu-score strong {
+    font-size: 1.4rem;
+  }
+
+  .entete-sudoku .jeu-score.score-principal .valeur-score {
+    font-size: 1.7rem;
+  }
+
+  .entete-sudoku .entete-boutons {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .sudoku-carnet {
+    padding: 18px 6px 6px;
+    border-radius: 5px;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      0 4px 0 #141a2a;
+  }
+
+  .sudoku-reliure {
+    height: 15px;
+  }
+
+  .sudoku-reliure i {
+    width: 5px;
+    height: 5px;
+  }
+
+  .sudoku-reliure i::before {
+    left: 1px;
+    top: -5px;
+    height: 7px;
+  }
+
+  .sudoku-reliure::before {
+    top: 1px;
+  }
+
+  .sudoku-modes,
+  .sudoku-outils {
+    flex-wrap: nowrap;
+    gap: 4px;
+  }
+
+  .sudoku-modes .difficulte,
+  .outil-sudoku,
+  .entete-sudoku .entete-boutons .jeu-quitter {
+    padding: 6px 8px;
+    font-size: 0.66rem;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+
+  .sudoku-feuille {
+    padding: 4px;
+  }
+
+  .pave-sudoku {
+    grid-template-columns: repeat(10, 1fr);
+    gap: 4px;
+  }
+
+  .touche-sudoku {
+    height: 42px;
+    font-size: 1.25rem;
+  }
+
+  .touche-sudoku .reste {
+    top: 2px;
+    right: 3px;
+  }
+
+  .outil-sudoku {
+    padding: 6px 8px;
+  }
+
+  .jeu-sudoku .jeu-message {
+    min-height: 0;
+    font-size: 0.8rem;
+  }
+
+  .jeu-sudoku .jeu-aide {
+    display: none;
+  }
+}
+
+.court-sudoku {
+  display: none;
+}
+
+/* Petits ecrans : libelles courts, en-tete resserre */
+@media (max-width: 420px) {
+  .long-sudoku {
+    display: none;
+  }
+
+  .court-sudoku {
+    display: inline;
+  }
+
+  .entete-sudoku {
+    gap: 4px 10px;
+  }
+
+  .entete-sudoku .jeu-score {
+    font-size: 0.6rem;
+  }
+
+  .entete-sudoku .jeu-score strong {
+    font-size: 1.15rem;
+  }
+
+  .entete-sudoku .jeu-score.score-principal .valeur-score {
+    font-size: 1.45rem;
+  }
+
+  .sudoku-modes .difficulte,
+  .outil-sudoku,
+  .entete-sudoku .entete-boutons .jeu-quitter {
+    padding: 5px 6px;
+    font-size: 0.6rem;
+    letter-spacing: 0;
+  }
+
+  .touche-sudoku {
+    height: 38px;
+  }
+}
+
+/* Rien ne se tasse dans la colonne : c'est la grille qui s'ajuste en JS */
+.jeu-sudoku > * {
+  flex-shrink: 0;
+}
+
+/* Le message tient sur une ligne, pour ne pas pousser le pave */
+@media (max-width: 560px) {
+  .jeu-sudoku .jeu-message {
+    min-height: 1.25em;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+@media (max-width: 360px) {
+  .sudoku-modes .difficulte {
+    padding: 5px 4px;
+  }
+}

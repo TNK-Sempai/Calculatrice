@@ -1,0 +1,31 @@
+/* =====================================================================
+   OMAMORI CRUSH
+   Le canvas est dimensionne en JS (540 x 668 logiques, net a toute
+   resolution). L'en-tete ne garde que les boutons : coups, objectif et
+   score sont dessines dans le jeu.
+   ===================================================================== */
+
+.jeu-omamori {
+  gap: 8px;
+}
+
+.entete-omamori {
+  width: min(96vw, 620px);
+  justify-content: flex-end;
+}
+
+.omamori-boutons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+}
+
+#canvasOmamori {
+  display: block;
+  max-width: 96vw;
+  border-radius: 14px;
+  border: 1px solid var(--bord-fort);
+  touch-action: none;
+  cursor: pointer;
+}
