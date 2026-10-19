@@ -1,0 +1,133 @@
+/* =====================================================================
+   VERSUS EN LIGNE - panneau commun aux jeux de plateau
+   ===================================================================== */
+
+.versus {
+  width: min(100%, 560px);
+  margin: 6px auto 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--bord-fort);
+  border-radius: var(--rayon);
+  background-color: var(--panneau);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-sizing: border-box;
+}
+
+.versus[hidden] {
+  display: none;
+}
+
+.versus-titre {
+  margin: 0;
+  font-family: var(--police-affichage);
+  font-weight: 800;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  color: var(--texte);
+}
+
+.versus-titre.resultat-victoire {
+  color: var(--accent);
+}
+
+.versus-titre.resultat-defaite {
+  color: #e2675e;
+}
+
+.versus-ligne {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.versus-texte,
+.versus-alerte,
+.versus-statut,
+.versus-duel {
+  margin: 0;
+  font-family: var(--police-texte);
+  font-size: 0.8rem;
+  color: var(--texte-sourd);
+}
+
+.versus-alerte:empty {
+  display: none;
+}
+
+.versus-alerte {
+  color: var(--texte);
+}
+
+.versus-duel {
+  color: var(--texte);
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.versus-duel strong {
+  font-family: var(--police-mono);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.versus-statut {
+  font-family: var(--police-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+}
+
+.versus-statut.a-toi {
+  color: var(--accent);
+}
+
+.versus-champ {
+  font-family: var(--police-mono);
+  font-size: 16px;               /* 16px : pas de zoom automatique sur iOS */
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  width: 9.5ch;
+  padding: 6px 8px;
+  color: var(--texte);
+  background-color: var(--fond);
+  border: 1px solid var(--bord-fort);
+  border-radius: var(--rayon-petit);
+}
+
+.versus-champ:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.versus-code {
+  margin: 0;
+  font-family: var(--police-mono);
+  font-weight: 600;
+  font-size: 1.4rem;
+  letter-spacing: 0.24em;
+  color: var(--accent);
+}
+
+.versus .versus-principal {
+  color: var(--encre);
+  background-color: var(--accent);
+  border-color: var(--accent);
+}
+
+.versus .versus-principal:hover {
+  color: var(--encre);
+  background-color: var(--accent-sombre);
+}
+
+@media (max-width: 420px) {
+  .versus {
+    padding: 8px;
+    gap: 6px;
+  }
+
+  .versus .jeu-quitter {
+    padding: 7px 9px;
+  }
+}

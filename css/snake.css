@@ -1,0 +1,44 @@
+/* =====================================================================
+   SNAKE
+   Extrait de style.css, aucune regle n'a ete modifiee.
+   ===================================================================== */
+
+/* Le Snake consomme 194 px en dehors de son canvas : en-tete, message,
+   ligne d'effets, aide, espaces et marges. Reserver seulement 160 px
+   faisait deborder le contenu d'un pixel en haut et en bas. */
+#canvasSnake {
+  width: min(90vw, calc(100vh - 194px - var(--hauteur-manette, 0px)));
+  height: auto;
+  aspect-ratio: 1;
+  background-color: var(--fond);
+  border: 1px solid #3a4a22;
+  border-radius: 6px;
+  touch-action: none;
+}
+
+/* ===== Snake ===== */
+/* L'en-tete garde la meme largeur que le canvas, sans toucher a la regle
+   generale .jeu-entete qui sert aux douze autres jeux. */
+.entete-snake {
+  width: min(90vw, calc(100vh - 194px - var(--hauteur-manette, 0px)));
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.jeu-snake .jeu-message,
+#messageSnake {
+  font-family: var(--police-affichage);
+  font-size: 1.3rem;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  min-height: 1.4em;
+  text-align: center;
+}
+
+.effets-snake {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: var(--texte-sourd);
+  min-height: 1.2em;
+  text-align: center;
+}

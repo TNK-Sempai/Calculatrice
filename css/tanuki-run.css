@@ -1,0 +1,31 @@
+/* =====================================================================
+   TANUKI RUN
+   Le canvas est dimensionne en JS : 720 x 300 en paysage, 400 x 400 sur
+   telephone tenu droit, toujours entre les classements lateraux et
+   au-dessus de la manette. Score et distance sont dessines dans le jeu.
+   ===================================================================== */
+
+.jeu-tanuki-run {
+  gap: 8px;
+}
+
+.entete-run {
+  width: min(96vw, 1100px);
+  justify-content: flex-end;
+}
+
+.entete-boutons-run {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+#canvasRun {
+  display: block;
+  max-width: 96vw;
+  background-color: #07070b;
+  border: 1px solid var(--bord-fort);
+  border-radius: 8px;
+  touch-action: none;
+  cursor: pointer;
+}

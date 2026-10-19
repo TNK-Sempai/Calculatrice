@@ -1,0 +1,47 @@
+/* =====================================================================
+   PACHINKO
+   Machine de 440 x 860 (plateau de 360 x 620 dedans), dimensionnee en JS.
+   ===================================================================== */
+
+.jeu-pachinko {
+  gap: 10px;
+}
+
+.entete-pachinko {
+  width: min(94vw, 560px);
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+
+#canvasPachinko {
+  display: block;
+  max-width: 96vw;
+  border-radius: 18px;
+  touch-action: none;
+  cursor: pointer;
+}
+
+/* Billes, pic et roulette sont affiches sur la machine elle-meme */
+.entete-pachinko .jeu-score {
+  display: none;
+}
+
+.entete-pachinko {
+  justify-content: flex-end;
+}
+
+@media (max-width: 560px) {
+  .entete-pachinko .jeu-score strong {
+    font-size: 1.4rem;
+  }
+
+  .entete-pachinko .jeu-score.score-principal .valeur-score {
+    font-size: 1.8rem;
+  }
+
+  .entete-pachinko .entete-boutons {
+    width: 100%;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+}

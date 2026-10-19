@@ -1,0 +1,139 @@
+/* =====================================================================
+   TANUKI GASSEN
+   Vue de 640 x 400 au format 16/10. La taille exacte du canevas est
+   calculee en JS (place entre l'en-tete, les armes et la manette) ;
+   --largeur-gassen ne sert qu'a aligner les bandeaux autour.
+   ===================================================================== */
+
+.jeu-gassen {
+  gap: 8px;
+  --largeur-gassen: min(94vw, 960px);
+}
+
+.entete-gassen,
+.gassen-reglages,
+.gassen-armes {
+  width: var(--largeur-gassen);
+  max-width: 96vw;
+  min-width: min(94vw, 360px);
+}
+
+.entete-gassen {
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+
+.gassen-boutons,
+.gassen-groupe {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.gassen-boutons {
+  margin-left: auto;
+}
+
+.gassen-reglages {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.gassen-groupe[hidden] {
+  display: none;
+}
+
+.jeu-gassen .jeu-quitter.active {
+  color: var(--fond);
+  background-color: var(--accent);
+  border-color: var(--accent);
+}
+
+.gassen-armes {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.gassen-arme {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 52px;
+  padding: 4px 2px;
+  position: relative;
+  line-height: 1.1;
+}
+
+.gassen-icone {
+  width: 22px;
+  height: 22px;
+  flex: none;
+}
+
+.gassen-nom {
+  font-size: 0.78em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.gassen-munitions {
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  font-size: 0.72em;
+  opacity: 0.8;
+}
+
+.gassen-arme:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+#canvasGassen {
+  display: block;
+  max-width: 96vw;
+  background-color: #0b0b12;
+  border: 1px solid var(--bord-fort);
+  border-radius: 8px;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+@media (max-width: 560px) {
+  .entete-gassen .jeu-score strong {
+    font-size: 1.3rem;
+  }
+
+  .gassen-boutons {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .gassen-armes {
+    gap: 4px;
+  }
+
+  .gassen-arme {
+    min-height: 40px;
+    padding: 3px 0;
+  }
+
+  .gassen-nom {
+    display: none;
+  }
+
+  .jeu-gassen .jeu-aide {
+    display: none;
+  }
+}
+
+body.avec-manette .jeu-gassen .jeu-aide {
+  display: none;
+}

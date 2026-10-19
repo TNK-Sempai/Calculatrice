@@ -30,8 +30,78 @@ const JEUX = {
   "sudoku-facile":    { sens: "bas",  min: 60,  max: 36000 },
   "sudoku-moyen":     { sens: "bas",  min: 90,  max: 36000 },
   "sudoku-difficile": { sens: "bas",  min: 120, max: 36000 },
-  "sudoku-extreme":   { sens: "bas",  min: 150, max: 36000 }
+  "sudoku-extreme":   { sens: "bas",  min: 150, max: 36000 },
+  "pong":             { sens: "haut", min: 1,   max: 2000000 },
+  "demineur-facile":  { sens: "bas",  min: 1,   max: 36000 },
+  "demineur-moyen":   { sens: "bas",  min: 5,   max: 36000 },
+  "demineur-difficile": { sens: "bas", min: 10, max: 36000 },
+  "dames-facile":     { sens: "haut", min: 1,   max: 1000000 },
+  "dames-moyen":      { sens: "haut", min: 1,   max: 1000000 },
+  "dames-difficile":  { sens: "haut", min: 1,   max: 1000000 },
+  "puissance4-facile":    { sens: "haut", min: 1, max: 1000000 },
+  "puissance4-moyen":     { sens: "haut", min: 1, max: 1000000 },
+  "puissance4-difficile": { sens: "haut", min: 1, max: 1000000 },
+  "tanukiland":       { sens: "haut", min: 1,   max: 10000000 },
+  // V2
+  "yokai-invaders":   { sens: "haut", min: 1,   max: 5000000 },
+  "bake-danuki":      { sens: "haut", min: 1,   max: 5000000 },
+  "tetris-sprint":    { sens: "bas",  min: 15000, max: 3600000 },
+  "mahjong-pagode":   { sens: "bas",  min: 30,  max: 36000 },
+  "mahjong-pont":     { sens: "bas",  min: 30,  max: 36000 },
+  "mahjong-dragon":   { sens: "bas",  min: 30,  max: 36000 },
+  "solitaire-europeen":    { sens: "bas", min: 1, max: 36 },
+  "solitaire-asymetrique": { sens: "bas", min: 1, max: 38 },
+  "solitaire-triangle":    { sens: "bas", min: 1, max: 14 },
+  // V2, nouveaux jeux
+  "karasu":           { sens: "haut", min: 1,   max: 5000000 },
+  "bunbuku":          { sens: "haut", min: 1,   max: 5000000 },
+  "kappa":            { sens: "haut", min: 1,   max: 5000000 },
+  "tanuki-run":       { sens: "haut", min: 1,   max: 1000000 },
+  "flappy-tengu":     { sens: "haut", min: 1,   max: 10000 },
+  "pagode":           { sens: "haut", min: 1,   max: 5000 },
+  "gassen":           { sens: "haut", min: 1,   max: 20000 },
+  "omamori":          { sens: "haut", min: 1,   max: 1000000000 },
+  "toro":             { sens: "haut", min: 1,   max: 1000000000 },
+  "motus-5":          { sens: "haut", min: 1,   max: 1000000 },
+  "motus-6":          { sens: "haut", min: 1,   max: 1000000 },
+  "motus-7":          { sens: "haut", min: 1,   max: 1000000 },
+  "motus-8":          { sens: "haut", min: 1,   max: 1000000 },
+  "oekaki-5":         { sens: "bas",  min: 5,   max: 36000 },
+  "oekaki-10":        { sens: "bas",  min: 5,   max: 36000 },
+  "oekaki-15":        { sens: "bas",  min: 5,   max: 36000 },
+  "go-facile":        { sens: "haut", min: 5,   max: 900 },
+  "go-moyen":         { sens: "haut", min: 5,   max: 900 },
+  "go-difficile":     { sens: "haut", min: 5,   max: 900 },
+  "oshidashi-facile":    { sens: "haut", min: 100, max: 1000 },
+  "oshidashi-moyen":     { sens: "haut", min: 100, max: 1000 },
+  "oshidashi-difficile": { sens: "haut", min: 100, max: 1000 },
+  "koikoi":           { sens: "haut", min: 1,   max: 600 },
+  "pachinko":         { sens: "haut", min: 1,   max: 100000 },
+  "matsuri":          { sens: "haut", min: 1,   max: 50000000 },
+  "shogi-facile":     { sens: "haut", min: 1,   max: 100000 },
+  "shogi-moyen":      { sens: "haut", min: 1,   max: 100000 },
+  "shogi-difficile":  { sens: "haut", min: 1,   max: 100000 },
+  "taiko":            { sens: "haut", min: 1,   max: 100000000 },
+  "bulles":           { sens: "haut", min: 1,   max: 1000000000 }
 };
+
+// Les grilles du jour ont un classement par date : "sudoku-jour-2026-10-18".
+// Plutot que d'en declarer une infinite, on reconnait leur forme.
+function reglesDuJeu(jeu) {
+  if (JEUX[jeu]) {
+    return JEUX[jeu];
+  }
+  if (/^sudoku-jour-\d{4}-\d{2}-\d{2}$/.test(jeu)) {
+    return { sens: "bas", min: 30, max: 36000 };
+  }
+  if (/^demineur-jour-\d{4}-\d{2}-\d{2}$/.test(jeu)) {
+    return { sens: "bas", min: 5, max: 36000 };
+  }
+  if (/^motus-jour-[5-8]-\d{4}-\d{2}-\d{2}$/.test(jeu)) {
+    return { sens: "haut", min: 1, max: 20000 };
+  }
+  return null;
+}
 
 // ---------------------------------------------------------------------
 // Points d'entree
@@ -39,10 +109,10 @@ const JEUX = {
 
 function doGet(evenement) {
   const jeu = (evenement.parameter && evenement.parameter.jeu) || "";
-  if (!JEUX[jeu]) {
+  if (!reglesDuJeu(jeu)) {
     return reponseJson({ erreur: "Jeu inconnu" });
   }
-  return reponseJson({ jeu: jeu, sens: JEUX[jeu].sens, scores: meilleursScores(jeu) });
+  return reponseJson({ jeu: jeu, sens: reglesDuJeu(jeu).sens, scores: meilleursScores(jeu) });
 }
 
 function doPost(evenement) {
@@ -54,7 +124,7 @@ function doPost(evenement) {
   }
 
   const jeu = String(corps.jeu || "");
-  const regles = JEUX[jeu];
+  const regles = reglesDuJeu(jeu);
   if (!regles) {
     return reponseJson({ erreur: "Jeu inconnu" });
   }
@@ -122,7 +192,7 @@ function lignes(feuille) {
 }
 
 function meilleursScores(jeu) {
-  const sens = JEUX[jeu].sens;
+  const sens = reglesDuJeu(jeu).sens;
   return lignes(feuilleScores())
     .filter(ligne => ligne[0] === jeu)
     .map(ligne => ({

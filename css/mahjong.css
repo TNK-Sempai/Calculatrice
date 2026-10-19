@@ -1,0 +1,391 @@
+/* =====================================================================
+   MAHJONG SOLITAIRE
+   Tuiles en os et jade avec une vraie epaisseur, faite d'ombres pleines
+   decalees (aucun flou). Motifs en SVG, taille calculee en JS.
+   ===================================================================== */
+
+.jeu-mahjong {
+  --colonnes-plateau: 15;
+  --rangees-plateau: 8;
+  --zoom-mahjong: 1;
+  /* --tuile-base est calcule en JS (largeur, classements, manette) */
+  --tuile-base: 36px;
+  --largeur-tuile: calc(var(--tuile-base) * var(--zoom-mahjong));
+  --hauteur-tuile: calc(var(--largeur-tuile) * 1.32);
+  --relief: calc(var(--largeur-tuile) * 0.12);
+  --ivoire-tuile: #f3ecdc;
+  gap: 10px;
+}
+
+.jeu-mahjong.loupe {
+  --zoom-mahjong: 1.75;
+}
+
+.entete-mahjong {
+  width: min(96vw, 760px);
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  justify-content: center;
+}
+
+.mahjong-outils {
+  width: min(96vw, 760px);
+}
+
+.mahjong-outils .jeu-quitter:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.loupe-mahjong {
+  display: none;
+}
+
+.loupe-mahjong.active {
+  color: var(--fond);
+  background-color: var(--accent);
+  border-color: var(--accent);
+}
+
+.combo-mahjong strong {
+  color: var(--texte-sourd);
+  transition: color 0.15s;
+}
+
+.combo-mahjong.chaud strong {
+  color: var(--accent);
+}
+
+/* Plus aucune paire jouable : le compteur passe au vermillon */
+.jeu-mahjong .jeu-score.alerte strong {
+  color: #ff7466;
+}
+
+/* Le cadre : un plateau de feutre vert sombre borde de bois. Il fait
+   defiler le tas quand la loupe est active. */
+.cadre-mahjong {
+  position: relative;
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: calc(var(--relief) * 5 + 8px) 8px 8px calc(var(--relief) * 5 + 8px);
+  touch-action: pan-x pan-y;
+  background: radial-gradient(ellipse 75% 70% at 50% 40%, #24533a 0%, #1b4430 60%, #153826 100%);
+  border: 8px solid #6b3c1f;
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 2px #2c140a, 0 0 0 2px #a8673a, 0 0 0 3px #3a1d0d, 0 6px 0 3px #24110a;
+  scrollbar-width: thin;
+}
+
+.plateau-mahjong {
+  position: relative;
+  width: calc(var(--largeur-tuile) * var(--colonnes-plateau) + var(--relief) * 4);
+  height: calc(var(--hauteur-tuile) * var(--rangees-plateau) + var(--relief) * 2);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Une tuile : face en os, tranche ivoire puis dos de jade, comme les
+   vraies tuiles. L'epaisseur est faite d'ombres pleines decalees, sans
+   aucun flou ; une ombre portee pleine et transparente la pose sur le feutre. */
+.tuile-mahjong {
+  position: absolute;
+  box-sizing: border-box;
+  width: var(--largeur-tuile);
+  height: var(--hauteur-tuile);
+  padding: calc(var(--largeur-tuile) * 0.07);
+  display: block;
+  background: linear-gradient(160deg, #fbf7ee 0%, var(--ivoire-tuile) 55%, #e6dcc4 100%);
+  border: 1px solid #8c7f62;
+  border-radius: calc(var(--largeur-tuile) * 0.12);
+  box-shadow:
+    calc(var(--relief) * -0.25) calc(var(--relief) * 0.25) 0 #e2d6ba,
+    calc(var(--relief) * -0.5) calc(var(--relief) * 0.5) 0 #cfc09c,
+    calc(var(--relief) * -0.7) calc(var(--relief) * 0.7) 0 #3d7a5a,
+    calc(var(--relief) * -1) calc(var(--relief) * 1) 0 #2a5c41,
+    calc(var(--relief) * -1.1) calc(var(--relief) * 1.1) 0 #10281b,
+    calc(var(--relief) * -1.6) calc(var(--relief) * 1.8) 0 rgba(4, 16, 9, 0.35);
+  cursor: default;
+  transition: transform 0.12s, background-color 0.12s;
+}
+
+/* Les tuiles bloquees sont voilees d'un aplat sombre, pour que les
+   jouables se lisent d'un coup d'oeil */
+.tuile-mahjong::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background-color: rgba(30, 42, 34, 0.38);
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+
+.tuile-mahjong[hidden] {
+  display: none;
+}
+
+.tuile-mahjong svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.tuile-mahjong .signe-han {
+  font-family: var(--police-jp);
+  font-weight: 600;
+}
+
+/* Une tuile jouable ressort du tas */
+.tuile-mahjong.libre {
+  cursor: pointer;
+}
+
+.tuile-mahjong.libre::after {
+  opacity: 0;
+}
+
+@media (hover: hover) {
+  .tuile-mahjong.libre:hover {
+    transform: translate(1px, -2px);
+  }
+}
+
+/* Choisie : la tuile se souleve et prend un liseré vert tilleul */
+.tuile-mahjong.choisie {
+  background: linear-gradient(160deg, #f7fbe4 0%, #e6f3b8 100%);
+  border-color: #5e7626;
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  transform: translate(2px, -5px);
+}
+
+/* Indice : deux battements, puis la tuile reste cerclee */
+.tuile-mahjong.indiquee {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  animation: mahjong-indice 0.5s ease-in-out 2;
+}
+
+@keyframes mahjong-indice {
+  50% {
+    transform: translate(2px, -6px);
+  }
+}
+
+/* Tuile bloquee touchee : elle refuse d'un petit mouvement */
+.tuile-mahjong.refus {
+  animation: mahjong-refus 0.25s ease-out;
+}
+
+@keyframes mahjong-refus {
+  25% {
+    transform: translateX(-2px);
+  }
+  75% {
+    transform: translateX(2px);
+  }
+}
+
+/* La paire se souleve, se rejoint a mi-chemin et s'efface */
+.tuile-mahjong.envol {
+  pointer-events: none;
+  animation: mahjong-envol 0.48s cubic-bezier(0.45, 0, 0.3, 1) forwards;
+}
+
+.tuile-mahjong.envol::after {
+  opacity: 0;
+}
+
+@keyframes mahjong-envol {
+  0% {
+    transform: translate(2px, -5px);
+  }
+  65% {
+    transform: translate(var(--vers-x, 0), calc(var(--vers-y, 0) - var(--hauteur-tuile) * 0.3));
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--vers-x, 0), calc(var(--vers-y, 0) - var(--hauteur-tuile) * 0.45)) scale(0.7);
+    opacity: 0;
+  }
+}
+
+/* Annuler : la paire retombe a sa place */
+.tuile-mahjong.revient {
+  animation: mahjong-revient 0.3s ease-out;
+}
+
+@keyframes mahjong-revient {
+  from {
+    transform: translateY(calc(var(--hauteur-tuile) * -0.4));
+    opacity: 0;
+  }
+}
+
+/* Melange : chaque tuile se retourne sur place */
+.plateau-mahjong.melange .tuile-mahjong {
+  animation: mahjong-melange 0.34s ease-in-out;
+}
+
+@keyframes mahjong-melange {
+  50% {
+    transform: scaleX(0.05);
+  }
+}
+
+/* Carte de fin */
+.fin-mahjong {
+  position: fixed;
+  left: 50%;
+  top: 42%;
+  z-index: 20000;
+  width: min(300px, 86%);
+  transform: translate(-50%, -50%);
+  padding: 30px 20px 18px;
+  background-color: #f6efdf;
+  border: 3px solid #c3271c;
+  border-radius: 8px;
+  box-shadow: 0 0 0 5px #f6efdf, 0 0 0 6px #c3271c, 0 10px 0 6px rgba(0, 0, 0, 0.35);
+  color: #1d1d26;
+  text-align: center;
+  animation: mahjong-fin 0.35s cubic-bezier(0.2, 0.8, 0.3, 1.2);
+}
+
+.fin-mahjong[hidden] {
+  display: none;
+}
+
+@keyframes mahjong-fin {
+  from {
+    transform: translate(-50%, -40%);
+    opacity: 0;
+  }
+}
+
+.fin-mahjong-titre {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 16px;
+  background-color: #c3271c;
+  color: #f6efdf;
+  font-family: var(--police-affichage);
+  font-weight: 800;
+  font-stretch: var(--etroit);
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border-radius: 3px;
+}
+
+.fin-mahjong-temps {
+  font-family: var(--police-affichage);
+  font-weight: 800;
+  font-stretch: var(--etroit);
+  font-size: 2.6rem;
+  line-height: 1;
+  margin-bottom: 12px;
+}
+
+.fin-mahjong dl {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 4px 14px;
+  justify-content: center;
+  font-size: 0.78rem;
+  text-align: left;
+}
+
+.fin-mahjong dt {
+  color: #6b604b;
+}
+
+.fin-mahjong dd {
+  font-weight: 600;
+}
+
+.fin-mahjong-record {
+  margin-top: 10px;
+  font-size: 0.74rem;
+  color: #c3271c;
+}
+
+.fin-mahjong .jeu-quitter {
+  margin-top: 12px;
+  color: #1d1d26;
+  border-color: #1d1d26;
+}
+
+.jeu-mahjong .jeu-message {
+  min-height: 1.3em;
+  font-family: var(--police-texte);
+  font-size: 0.88rem;
+  color: var(--texte-sourd);
+  text-align: center;
+}
+
+@media (max-width: 760px) {
+  .loupe-mahjong {
+    display: inline-block;
+  }
+
+  .entete-mahjong .jeu-score strong {
+    font-size: 1.4rem;
+  }
+
+  .entete-mahjong .jeu-score.score-principal .valeur-score {
+    font-size: 1.8rem;
+  }
+
+  .mahjong-outils .jeu-quitter,
+  #dispositionsMahjong .jeu-quitter {
+    padding: 7px 8px;
+    font-size: 0.6rem;
+  }
+
+  .cadre-mahjong {
+    border-width: 6px;
+    padding: calc(var(--relief) * 5 + 6px) 6px 6px calc(var(--relief) * 5 + 6px);
+  }
+
+  .jeu-mahjong .jeu-aide {
+    display: none;
+  }
+}
+
+.tuile-mahjong .chiffre-tuile {
+  font-family: var(--police-affichage);
+}
+
+/* Tres petits ecrans : boutons plus serres pour laisser la place au tas */
+@media (max-width: 360px) {
+  .entete-mahjong {
+    gap: 2px 10px;
+  }
+
+  .entete-mahjong .jeu-score strong {
+    font-size: 1.15rem;
+  }
+
+  .entete-mahjong .jeu-score.score-principal .valeur-score {
+    font-size: 1.4rem;
+  }
+
+  .mahjong-outils,
+  #dispositionsMahjong {
+    gap: 4px;
+  }
+
+  .mahjong-outils .jeu-quitter,
+  #dispositionsMahjong .jeu-quitter {
+    padding: 5px 6px;
+    font-size: 0.54rem;
+    letter-spacing: 0.04em;
+  }
+}

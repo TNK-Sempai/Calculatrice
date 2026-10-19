@@ -1,0 +1,27 @@
+/* =====================================================================
+   PAC-TANUKI
+   Canvas dimensionne en JS (304 x 370 logiques, net a toute resolution).
+   Score, record, niveau et vies sont dessines dans le jeu.
+   ===================================================================== */
+
+.jeu-danuki {
+  gap: 8px;
+}
+
+.entete-danuki {
+  width: min(96vw, 640px);
+  justify-content: flex-end;
+}
+
+.entete-danuki .jeu-score {
+  display: none;
+}
+
+#canvasDanuki {
+  display: block;
+  max-width: 96vw;
+  background-color: #0b0b10;
+  border: 1px solid var(--bord-fort);
+  border-radius: 10px;
+  touch-action: none;
+}

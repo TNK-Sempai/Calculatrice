@@ -1,0 +1,604 @@
+/* =====================================================================
+   BLACKJACK - le tripot du kitsune
+   Tapis de feutre borde de bois. Cartes en SVG : faces nettes a toutes
+   les tailles, figures yokai, dos en laque vermillon au tanuki.
+   ===================================================================== */
+
+.jeu-blackjack {
+  --largeur-table: min(94vw, 780px);
+  --carte-l: 76px;
+  --carte-h: 106px;
+  gap: 10px;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.entete-blackjack {
+  width: var(--largeur-table);
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+
+.boutons-blackjack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.jeu-blackjack .jeu-quitter:disabled {
+  opacity: 0.32;
+  cursor: default;
+}
+
+.serie-blackjack strong {
+  color: var(--texte-sourd);
+}
+
+.serie-blackjack.chaud strong {
+  color: var(--accent);
+}
+
+/* ===== Table ===== */
+.tapis {
+  width: var(--largeur-table);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px 22px 28px;
+  /* Feutre vert : un aplat qui s'eclaire doucement sous la lampe */
+  background: radial-gradient(ellipse 80% 70% at 50% 35%, #1f5a37 0%, #17472b 55%, #113720 100%);
+  /* Bord en bois : filet clair, rail verni, ombre sous la table */
+  border: 12px solid #6b3c1f;
+  border-radius: 26px 26px 170px 170px / 26px 26px 80px 80px;
+  box-shadow:
+    inset 0 0 0 2px #2c140a,
+    inset 0 3px 0 2px rgba(0, 0, 0, 0.28),
+    0 0 0 2px #a8673a,
+    0 0 0 4px #3a1d0d,
+    0 8px 0 4px #24110a;
+  background-clip: padding-box;
+  cursor: default;
+}
+
+.zone-croupier {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+}
+
+.croupier {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.kitsune {
+  display: block;
+  width: 64px;
+  height: 64px;
+}
+
+.kitsune svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Le croupier reagit : un petit sursaut a chaque changement d'humeur */
+.kitsune[data-humeur="rit"] svg,
+.kitsune[data-humeur="surpris"] svg {
+  animation: sursaut 0.32s ease-out;
+}
+
+@keyframes sursaut {
+  40% {
+    transform: translateY(-4px);
+  }
+}
+
+.croupier-infos {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.etiquette {
+  font-size: 0.56rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #a9c3ad;
+}
+
+.croupier-infos strong {
+  font-family: var(--police-affichage);
+  font-weight: 800;
+  font-stretch: var(--etroit);
+  font-size: 1.4rem;
+  color: var(--texte);
+  min-width: 1.5em;
+}
+
+/* Le sabot s'amincit a mesure qu'on y pioche */
+.sabot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.sabot-cartes {
+  width: 50px;
+  height: 70px;
+  border-radius: 5px;
+  box-shadow: 0 2px 0 #f0e8d6, 0 4px 0 #d8ccb2, 0 var(--epaisseur, 6px) 0 #b9ab8e, 0 calc(var(--epaisseur, 6px) + 3px) 0 rgba(0, 0, 0, 0.35);
+}
+
+.sabot-cartes svg,
+.carte-face svg,
+.carte-dos svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.sabot-nombre {
+  font-size: 0.56rem;
+  letter-spacing: 0.1em;
+  color: #a9c3ad;
+  margin-top: var(--epaisseur, 6px);
+}
+
+.tapis-regle {
+  text-align: center;
+  font-size: 0.54rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(232, 197, 71, 0.5);
+}
+
+.tapis-regle [lang="ja"] {
+  font-size: 0.72rem;
+  letter-spacing: 0.25em;
+}
+
+.jeu-blackjack .jeu-message {
+  font-family: var(--police-texte);
+  font-stretch: normal;
+  font-weight: 500;
+  font-size: 0.92rem;
+  letter-spacing: 0;
+  text-align: center;
+  color: var(--texte);
+  min-height: 1.5em;
+}
+
+.jeu-blackjack .jeu-message.resultat {
+  font-family: var(--police-affichage);
+  font-weight: 700;
+  font-stretch: var(--etroit);
+  font-size: 1.3rem;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+}
+
+/* ===== Cartes ===== */
+.cartes {
+  display: flex;
+  align-items: flex-start;
+  min-height: var(--carte-h);
+}
+
+.cartes-croupier {
+  justify-content: center;
+}
+
+.carte {
+  position: relative;
+  flex: none;
+  width: var(--carte-l);
+  height: var(--carte-h);
+}
+
+/* Les cartes se chevauchent comme sur une vraie table */
+.carte + .carte {
+  margin-left: calc(var(--carte-l) * -0.32);
+}
+
+.carte-face,
+.carte-dos {
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+}
+
+.carte-face,
+.carte-dos {
+  border-radius: calc(var(--carte-l) * 0.08);
+  box-shadow: -2px 3px 0 rgba(0, 0, 0, 0.28);
+}
+
+.carte-dos {
+  display: none;
+}
+
+.carte.cachee .carte-dos {
+  display: block;
+}
+
+.carte.cachee .carte-face {
+  visibility: hidden;
+}
+
+/* Distribution : la carte part du sabot, de dos, et se retourne en arrivant */
+.carte.distribuee {
+  animation: distribuer 0.3s cubic-bezier(0.2, 0.7, 0.2, 1) var(--delai, 0ms) backwards;
+}
+
+.carte.distribuee .carte-dos {
+  display: block;
+  animation: dos-en-vol 0.3s steps(1, end) var(--delai, 0ms) forwards;
+}
+
+.carte.cachee.distribuee .carte-dos {
+  animation: none;
+}
+
+@keyframes distribuer {
+  from {
+    transform: translate(var(--dx, 0), var(--dy, 0)) rotate(-12deg);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes dos-en-vol {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* La carte cachee du croupier se retourne sur place */
+.carte.retournee {
+  animation: retourner 0.34s ease-in-out var(--delai, 0ms) backwards;
+}
+
+.carte.retournee .carte-dos {
+  display: block;
+  animation: dos-retourne 0.34s linear var(--delai, 0ms) forwards;
+}
+
+@keyframes retourner {
+  0% {
+    transform: scaleX(1);
+  }
+  50% {
+    transform: scaleX(0);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes dos-retourne {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* ===== Mains du joueur ===== */
+.mains-joueur {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px 22px;
+  min-height: calc(var(--carte-h) + 44px);
+}
+
+.main-joueur {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  transition: opacity 0.3s, border-color 0.2s;
+}
+
+.main-joueur.active {
+  border-color: var(--accent);
+}
+
+.main-joueur.perdu,
+.main-joueur.abandon {
+  opacity: 0.5;
+}
+
+.main-details {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 28px;
+}
+
+.main-details strong {
+  font-family: var(--police-affichage);
+  font-weight: 800;
+  font-stretch: var(--etroit);
+  font-size: 1.35rem;
+  color: var(--texte);
+}
+
+.main-joueur.gagne .main-details strong,
+.main-joueur.blackjack .main-details strong {
+  color: var(--accent);
+}
+
+.main-mise {
+  font-size: 0.58rem;
+  letter-spacing: 0.06em;
+  color: #a9c3ad;
+}
+
+.main-gain {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--texte-sourd);
+}
+
+.main-gain.plus {
+  color: var(--accent);
+}
+
+.main-gain.moins {
+  color: #ff7466;
+}
+
+/* ===== Jetons ===== */
+.pile-jetons {
+  position: relative;
+  width: 30px;
+  height: 34px;
+  transition: transform 0.55s cubic-bezier(0.5, 0, 0.3, 1), opacity 0.55s;
+}
+
+/* Un jeton vu de profil : tranche coloree, liseres blancs, ombre dessous */
+.jeton {
+  position: absolute;
+  left: 0;
+  bottom: calc(var(--i) * 4px);
+  width: 30px;
+  height: 9px;
+  border-radius: 50% / 45%;
+  background:
+    linear-gradient(90deg, transparent 18%, rgba(255, 255, 255, 0.85) 18% 26%, transparent 26% 46%, rgba(255, 255, 255, 0.85) 46% 54%, transparent 54% 74%, rgba(255, 255, 255, 0.85) 74% 82%, transparent 82%) center bottom / 100% 4px no-repeat,
+    linear-gradient(var(--jeton-clair), var(--jeton) 45%, var(--jeton-sombre));
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.45);
+}
+
+.jeton-ivoire {
+  --jeton: #e9e1d0;
+  --jeton-clair: #faf6ec;
+  --jeton-sombre: #b9ad95;
+  background-color: #e9e1d0;
+}
+
+.jeton-vermillon {
+  --jeton: #c8372d;
+  --jeton-clair: #e25a4c;
+  --jeton-sombre: #86211a;
+  background-color: #c8372d;
+}
+
+.jeton-indigo {
+  --jeton: #3e4f96;
+  --jeton-clair: #5a6cb6;
+  --jeton-sombre: #27326a;
+  background-color: #3e4f96;
+}
+
+.jeton-lime {
+  --jeton: #a9d046;
+  --jeton-clair: #c8f060;
+  --jeton-sombre: #6c8c22;
+  background-color: #a9d046;
+}
+
+/* Gagne : les jetons descendent vers ta cave. Perdu : ils montent chez le kitsune */
+.pile-jetons.vers-joueur {
+  transform: translateY(80px);
+  opacity: 0;
+}
+
+.pile-jetons.vers-croupier {
+  transform: translateY(-240px);
+  opacity: 0;
+}
+
+/* ===== Commandes ===== */
+.commandes-blackjack {
+  width: var(--largeur-table);
+}
+
+.commandes-blackjack[hidden] {
+  display: none;
+}
+
+.mise-jeton {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  border: 0;
+  border-radius: 50%;
+  /* Vu de dessus : six encoches blanches sur la tranche, un anneau, le centre lisse */
+  background:
+    radial-gradient(circle closest-side, var(--jeton) 0 60%, rgba(255, 255, 255, 0.8) 60% 65%, var(--jeton) 65% 74%, transparent 74%),
+    conic-gradient(from 15deg, #f6f0e2 0 30deg, var(--jeton) 30deg 60deg, #f6f0e2 60deg 90deg, var(--jeton) 90deg 120deg, #f6f0e2 120deg 150deg, var(--jeton) 150deg 180deg, #f6f0e2 180deg 210deg, var(--jeton) 210deg 240deg, #f6f0e2 240deg 270deg, var(--jeton) 270deg 300deg, #f6f0e2 300deg 330deg, var(--jeton) 330deg 360deg);
+  box-shadow: 0 4px 0 var(--jeton-sombre), 0 6px 0 rgba(0, 0, 0, 0.35);
+  font-family: var(--police-affichage);
+  font-weight: 800;
+  font-stretch: 80%;
+  font-size: 1.05rem;
+  color: #1a1a20;
+  cursor: pointer;
+  transition: transform 0.08s, box-shadow 0.08s;
+}
+
+.mise-jeton.jeton-vermillon,
+.mise-jeton.jeton-indigo {
+  color: #ede8df;
+}
+
+.mise-jeton:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--jeton-sombre), 0 3px 0 rgba(0, 0, 0, 0.35);
+}
+
+.mise-jeton:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.action-blackjack {
+  min-width: 92px;
+  padding: 11px 14px;
+  font-size: 0.72rem;
+}
+
+.stats-blackjack {
+  font-size: 0.6rem;
+  letter-spacing: 0.04em;
+  color: var(--texte-sourd);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===== Telephone ===== */
+@media (max-width: 560px) {
+  .jeu-blackjack {
+    --carte-l: 46px;
+    --carte-h: 66px;
+  }
+
+  .entete-blackjack .jeu-score strong {
+    font-size: 1.5rem;
+  }
+
+  .entete-blackjack .jeu-score.score-principal .valeur-score {
+    font-size: 1.9rem;
+  }
+
+  .boutons-blackjack {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .tapis {
+    padding: 10px 10px 18px;
+    border-width: 8px;
+    border-radius: 18px 18px 90px 90px / 18px 18px 40px 40px;
+  }
+
+  .zone-croupier {
+    gap: 8px;
+  }
+
+  .kitsune {
+    width: 48px;
+    height: 48px;
+  }
+
+  .sabot-cartes {
+    width: 36px;
+    height: 50px;
+  }
+
+  .mise-jeton {
+    width: 52px;
+    height: 52px;
+  }
+
+  .action-blackjack {
+    min-width: 0;
+    flex: 1 1 28%;
+    padding: 12px 6px;
+  }
+}
+
+/* Petits ecrans en hauteur : la table se resserre pour tenir au-dessus
+   de la manette */
+@media (max-width: 560px) and (max-height: 760px) {
+  .jeu-blackjack {
+    --carte-l: 40px;
+    --carte-h: 56px;
+    gap: 6px;
+  }
+
+  .entete-blackjack .jeu-score.score-principal .valeur-score {
+    font-size: 1.5rem;
+  }
+
+  .entete-blackjack .jeu-score strong {
+    font-size: 1.2rem;
+  }
+
+  .boutons-blackjack .jeu-quitter {
+    padding: 5px 8px;
+  }
+
+  .tapis {
+    gap: 4px;
+    padding: 8px 8px 12px;
+  }
+
+  .tapis-regle {
+    display: none;
+  }
+
+  .kitsune {
+    width: 38px;
+    height: 38px;
+  }
+
+  .sabot-cartes {
+    width: 30px;
+    height: 42px;
+  }
+
+  .mains-joueur {
+    min-height: calc(var(--carte-h) + 34px);
+  }
+
+  .main-joueur {
+    padding: 4px 6px;
+    gap: 4px;
+  }
+
+  .mise-jeton {
+    width: 44px;
+    height: 44px;
+    font-size: 0.9rem;
+  }
+
+  .action-blackjack {
+    padding: 9px 4px;
+  }
+
+  .stats-blackjack {
+    display: none;
+  }
+}
+

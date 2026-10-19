@@ -1,0 +1,36 @@
+/* =====================================================================
+   PICROSS
+   Canvas dimensionne en JS (560 x 700 logiques), net a toute
+   resolution. L'en-tete ne garde que les boutons.
+   ===================================================================== */
+
+.jeu-oekaki {
+  gap: 8px;
+}
+
+.entete-oekaki {
+  width: min(96vw, 640px);
+  justify-content: flex-end;
+}
+
+.oekaki-boutons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+  justify-content: flex-end;
+}
+
+.oekaki-boutons .jeu-quitter[aria-pressed="true"] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+#canvasOekaki {
+  display: block;
+  max-width: 96vw;
+  border-radius: 14px;
+  border: 1px solid var(--bord-fort);
+  touch-action: none;
+  cursor: pointer;
+}

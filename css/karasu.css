@@ -1,0 +1,29 @@
+/* =====================================================================
+   GALAXIAN (karasu)
+   Ciel vertical de 480 x 720 logiques, dimensionne en JS et net a toute
+   resolution. Score, record, vague et vies sont dessines dans le jeu.
+   ===================================================================== */
+
+.jeu-karasu {
+  gap: 8px;
+}
+
+.entete-karasu {
+  justify-content: flex-end;
+}
+
+.entete-karasu .entete-boutons {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+#canvasKarasu {
+  display: block;
+  max-width: 96vw;
+  background-color: #0c0e26;
+  border: 1px solid var(--bord-fort);
+  border-radius: 10px;
+  touch-action: none;
+  cursor: crosshair;
+}

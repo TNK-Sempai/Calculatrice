@@ -1,0 +1,62 @@
+/* =====================================================================
+   GO 9x9
+   ===================================================================== */
+
+.jeu-go {
+  gap: 10px;
+}
+
+.entete-go {
+  width: min(96vw, 620px);
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+
+.entete-go .entete-boutons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.jeu-go .jeu-quitter:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+#canvasGo {
+  display: block;
+  max-width: 96vw;
+  border-radius: 12px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.jeu-go .jeu-message {
+  font-family: var(--police-texte);
+  font-size: 0.9rem;
+  color: var(--texte);
+  text-align: center;
+  min-height: 1.4em;
+  max-width: min(94vw, 560px);
+}
+
+@media (max-width: 560px) {
+  .entete-go .entete-boutons {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .entete-go .jeu-quitter {
+    padding: 7px 9px;
+  }
+}
+
+/* Petit telephone : en-tete serre, pour laisser la place au plateau */
+@media (max-width: 420px) {
+  .entete-go { gap: 4px 8px; }
+  .entete-go .jeu-score strong { font-size: 1.15rem; }
+  .entete-go .entete-boutons { gap: 4px; }
+  .entete-go .jeu-quitter,
+  #jeuGo .scores-ligne button { padding: 4px 7px; font-size: 0.56rem; }
+}

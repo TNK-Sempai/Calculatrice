@@ -1,0 +1,45 @@
+/* =====================================================================
+   CASSE-BRIQUES (tuiles kawara)
+   ===================================================================== */
+
+.jeu-briques {
+  gap: 8px;
+}
+
+/* Score, combo, niveau et vies sont dessines dans le canvas */
+.entete-briques .jeu-score {
+  display: none;
+}
+
+.entete-briques {
+  justify-content: flex-end;
+}
+
+.entete-briques .entete-boutons {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.message-briques {
+  font-family: var(--police-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--texte-sourd);
+  min-height: 1.2em;
+  margin: 0;
+  text-align: center;
+}
+
+#canvasBriques {
+  display: block;
+  max-width: 96vw;
+  background-color: #0b0b10;
+  border: 1px solid var(--bord-fort);
+  border-radius: 10px;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  cursor: none;
+}

@@ -1,0 +1,732 @@
+/* =====================================================================
+   FACADE - la calculatrice et son ruban imprime
+   Un objet, pas une page : le boitier a gauche, le ruban qui sort a
+   droite sur grand ecran, au-dessus sur telephone.
+   ===================================================================== */
+
+.poste {
+  display: grid;
+  grid-template-columns: minmax(0, 410px) 250px;
+  gap: 14px;
+  align-items: stretch;
+  width: 100%;
+  max-width: 674px;
+  position: relative;
+  z-index: 1;
+}
+
+.poste[hidden] {
+  display: none;
+}
+
+/* Retour d'un jeu : la calculatrice revient sans a-coup */
+.poste.retour {
+  animation: retour-poste 0.24s ease-out;
+}
+
+@keyframes retour-poste {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ===== Boitier ===== */
+.appareil {
+  background-color: var(--panneau);
+  border: 1px solid var(--bord);
+  border-top-color: var(--bord-fort);
+  border-radius: 18px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* ===== En-tete ===== */
+.entete {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.titre {
+  font-family: var(--police-affichage);
+  font-weight: 800;
+  font-size: 2.3rem;
+  line-height: 0.9;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.titre-creux {
+  color: transparent;
+  -webkit-text-stroke: 1.2px var(--accent);
+  margin-left: 6px;
+}
+
+/* Appui long en cours sur le titre : il se remplit pour montrer
+   qu'il se passe quelque chose avant d'ouvrir le menu */
+.titre.appui .titre-creux {
+  color: var(--accent);
+  transition: color 1.5s linear;
+}
+
+.sous-titre {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 6px;
+  font-size: 0.78rem;
+  color: var(--texte-sourd);
+}
+
+.modele {
+  font-family: var(--police-mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.12em;
+  color: var(--texte-eteint);
+}
+
+.bascule-angle {
+  font-family: var(--police-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  background: none;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.bascule-angle:hover {
+  background-color: var(--accent);
+  color: var(--fond);
+}
+
+/* ===== Ecran ===== */
+.ecran {
+  background-color: var(--fond-profond);
+  border: 1px solid var(--bord);
+  border-radius: 12px;
+  padding: 12px 16px 14px;
+  margin-bottom: 16px;
+  text-align: right;
+  min-height: 138px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 6px;
+  position: relative;
+}
+
+/* Voyants facon segments LCD : eteints ils restent visibles */
+.voyants {
+  position: absolute;
+  top: 10px;
+  left: 14px;
+  display: flex;
+  gap: 10px;
+  font-family: var(--police-mono);
+  font-size: 0.54rem;
+  letter-spacing: 0.12em;
+  color: var(--texte-eteint);
+  opacity: 0.6;
+}
+
+.voyant.allume {
+  color: var(--accent);
+  opacity: 1;
+}
+
+.voyants .voyant.allume {
+  opacity: 1;
+}
+
+.expression {
+  font-family: var(--police-affichage);
+  font-weight: 600;
+  font-stretch: 78%;
+  font-size: 3.2rem;
+  line-height: 1.05;
+  color: var(--texte);
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+  font-variant-numeric: tabular-nums;
+  transition: font-size 0.12s;
+}
+
+.expression[data-taille="m"] {
+  font-size: 2.4rem;
+}
+
+.expression[data-taille="s"] {
+  font-size: 1.7rem;
+}
+
+.expression::-webkit-scrollbar {
+  display: none;
+}
+
+.expression.resultat {
+  color: var(--accent);
+  cursor: copy;
+}
+
+.expression.erreur {
+  color: #ff7466;
+}
+
+.apercu {
+  font-size: 0.74rem;
+  color: var(--texte-sourd);
+  min-height: 1.2rem;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+}
+
+/* ===== Clavier ===== */
+.clavier {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.touche {
+  height: 54px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--bord);
+  border-radius: var(--rayon);
+  font-family: var(--police-mono);
+  font-size: 0.8rem;
+  color: var(--texte);
+  background-color: var(--panneau-clair);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: background-color 0.12s, border-color 0.12s, color 0.12s, transform 0.06s;
+}
+
+.touche sup {
+  font-size: 0.62em;
+  line-height: 0;
+}
+
+.touche:hover {
+  border-color: var(--bord-fort);
+}
+
+/* Enfoncee a la souris, au doigt ou depuis le clavier physique */
+.touche:active,
+.touche.enfoncee {
+  transform: translateY(1px);
+  background-color: #1f1f29;
+  border-color: var(--texte-sourd);
+}
+
+.chiffre {
+  font-family: var(--police-affichage);
+  font-weight: 600;
+  font-stretch: 90%;
+  font-size: 1.5rem;
+}
+
+.fonction {
+  color: var(--texte-sourd);
+}
+
+.fonction:hover {
+  color: var(--texte);
+}
+
+.controle {
+  color: var(--accent);
+  font-size: 0.95rem;
+}
+
+.operateur {
+  font-size: 1.3rem;
+  color: var(--accent);
+}
+
+.egal {
+  grid-row: span 2;
+  height: auto;
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: var(--fond);
+  font-family: var(--police-affichage);
+  font-weight: 800;
+  font-size: 2.1rem;
+}
+
+.egal:hover {
+  background-color: var(--accent-sombre);
+  border-color: var(--accent-sombre);
+}
+
+.egal:active,
+.egal.enfoncee {
+  background-color: var(--accent-sombre);
+  border-color: var(--accent-sombre);
+}
+
+/* La touche 2nd allumee */
+.touche-second[aria-pressed="true"] {
+  color: var(--fond);
+  background-color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* Touches a double fonction : le second libelle remonte en mode 2nd.
+   C'est le seul mouvement du clavier, il montre quelles touches changent. */
+.double .l1,
+.double .l2 {
+  grid-area: 1 / 1;
+  transition: transform 0.16s var(--courbe), opacity 0.16s;
+}
+
+.double .l2 {
+  color: var(--accent);
+  transform: translateY(120%);
+  opacity: 0;
+}
+
+.appareil.second .double .l1 {
+  transform: translateY(-120%);
+  opacity: 0;
+}
+
+.appareil.second .double .l2 {
+  transform: none;
+  opacity: 1;
+}
+
+.appareil.second .double {
+  border-color: rgba(200, 240, 96, 0.35);
+}
+
+/* ===== Pied ===== */
+.pied-calc {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--bord);
+}
+
+.lien-pied {
+  font-family: var(--police-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  color: var(--texte-sourd);
+  text-decoration: none;
+  border: 1px solid var(--bord);
+  border-radius: 999px;
+  padding: 7px 12px;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+}
+
+.lien-pied:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.lien-pied.cafe {
+  color: var(--accent-sombre);
+  border-color: rgba(159, 196, 63, 0.5);
+}
+
+.lien-pied.cafe:hover {
+  color: var(--fond);
+  background-color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* N'apparait qu'apres un premier code trouve */
+.compteur-secrets {
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  color: var(--texte-sourd);
+  white-space: nowrap;
+}
+
+.compteur-secrets[hidden] {
+  display: none;
+}
+
+.compteur-secrets strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* ===== Ruban ===== */
+.ruban {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+}
+
+.ruban-barre {
+  display: flex;
+  gap: 14px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 2px 8px;
+}
+
+.ruban-titre {
+  margin-right: auto;
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--texte-eteint);
+}
+
+.ruban-action {
+  font-family: var(--police-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  color: var(--texte-sourd);
+  background: none;
+  border: none;
+  padding: 4px 2px;
+  cursor: pointer;
+}
+
+.ruban-action:hover {
+  color: var(--accent);
+}
+
+.ruban-deplier {
+  display: none;
+}
+
+/* Le papier, dechire en haut */
+.ruban-papier {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  background-color: var(--papier);
+  color: var(--encre);
+  clip-path: polygon(0.00% 0px, 6.25% 7px, 12.50% 0px, 18.75% 7px, 25.00% 0px, 31.25% 7px, 37.50% 0px, 43.75% 7px, 50.00% 0px, 56.25% 7px, 62.50% 0px, 68.75% 7px, 75.00% 0px, 81.25% 7px, 87.50% 0px, 93.75% 7px, 100.00% 0px, 100% 100%, 0 100%);
+  margin: 0 10px;
+}
+
+.ruban-liste {
+  list-style: none;
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 22px 12px 8px;
+  scrollbar-width: none;
+  /* Le haut du ruban s'efface : on lit d'abord les derniers calculs */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 56px);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 56px);
+}
+
+.ruban-liste::-webkit-scrollbar {
+  display: none;
+}
+
+/* Les lignes s'empilent depuis la tete d'impression, en bas */
+.ruban-liste > :first-child {
+  margin-top: auto;
+}
+
+.ruban-ligne {
+  border-bottom: 1px dashed rgba(26, 26, 32, 0.2);
+  font-size: 0.66rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.ruban-ligne:last-child {
+  border-bottom: none;
+}
+
+.ruban-vide {
+  color: rgba(26, 26, 32, 0.45);
+  font-size: 0.6rem;
+  line-height: 1.6;
+  text-align: center;
+  padding: 10px 0;
+}
+
+.ruban-bouton,
+.ruban-code {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+  padding: 7px 4px;
+  text-align: right;
+  font-family: var(--police-mono);
+  color: inherit;
+  background: none;
+  border: none;
+}
+
+.ruban-bouton {
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.ruban-bouton:hover:not(:disabled) {
+  background-color: rgba(26, 26, 32, 0.07);
+}
+
+.ruban-bouton:disabled {
+  cursor: default;
+}
+
+.ruban-bouton:focus-visible {
+  outline: 2px solid var(--encre);
+  outline-offset: -2px;
+}
+
+.ruban-expr {
+  color: #6b675f;
+  word-break: break-all;
+}
+
+.ruban-res {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  word-break: break-all;
+}
+
+.ruban-egal {
+  color: #6b675f;
+  font-weight: 400;
+}
+
+/* Un code secret, a l'encre rouge */
+.ruban-code .ruban-expr,
+.ruban-code .ruban-res {
+  color: var(--vermillon);
+}
+
+.ruban-code .ruban-res {
+  align-items: baseline;
+}
+
+.ruban-jp {
+  font-size: 0.78rem;
+}
+
+/* Le papier avance par crans, comme le moteur d'une imprimante */
+.ruban-ligne.imprime {
+  animation: alimentation 0.3s steps(4, end);
+}
+
+@keyframes alimentation {
+  from {
+    clip-path: inset(0 0 100% 0);
+    transform: translateY(14px);
+  }
+  to {
+    clip-path: inset(0);
+    transform: none;
+  }
+}
+
+/* La tete d'impression, d'ou sort le papier */
+.ruban-tete {
+  height: 16px;
+  background-color: var(--panneau-clair);
+  border: 1px solid var(--bord-fort);
+  border-radius: 4px 4px 10px 10px;
+  position: relative;
+}
+
+.ruban-tete::before {
+  content: "";
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  top: 3px;
+  height: 2px;
+  border-radius: 2px;
+  background-color: var(--fond-profond);
+}
+
+/* ===== Telephone et tablette etroite =====
+   Le ruban passe au-dessus du boitier et ne montre que sa derniere
+   ligne. Il n'apparait qu'une fois qu'il a servi. */
+@media (max-width: 760px) {
+  body {
+    padding: 12px;
+    align-items: flex-start;
+  }
+
+  .poste {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 440px;
+    margin: auto;
+    gap: 10px;
+  }
+
+  .ruban {
+    order: -1;
+    display: none;
+  }
+
+  .ruban.a-servi {
+    display: flex;
+  }
+
+  .ruban-barre {
+    padding: 0 2px 6px;
+  }
+
+  .ruban-papier {
+    flex: none;
+    margin: 0;
+    transition: height 0.24s var(--courbe);
+  }
+
+  .ruban.deplie .ruban-papier {
+    height: min(46vh, 340px);
+  }
+
+  .ruban-liste {
+    padding-top: 14px;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 18px);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 18px);
+  }
+
+  .ruban:not(.deplie) .ruban-liste {
+    overflow: hidden;
+  }
+
+  .ruban:not(.deplie) .ruban-action:not(.ruban-deplier) {
+    display: none;
+  }
+
+  .ruban-deplier {
+    display: inline;
+  }
+
+  .ruban-tete {
+    display: none;
+  }
+
+  .appareil {
+    padding: 18px 16px;
+  }
+
+  .pied-calc {
+    flex-wrap: wrap;
+  }
+
+  .compteur-secrets {
+    order: -1;
+    flex-basis: 100%;
+    text-align: center;
+  }
+
+  .touche {
+    height: clamp(46px, 6.4vh, 60px);
+  }
+
+  .egal {
+    height: auto;
+  }
+
+  .ecran {
+    min-height: 116px;
+  }
+
+  .entete {
+    margin-bottom: 12px;
+  }
+
+  /* Replie, le ruban tient sur une ligne : le calcul a gauche, le resultat a droite */
+  .ruban:not(.deplie) .ruban-papier {
+    height: 40px;
+  }
+
+  .ruban:not(.deplie) .ruban-liste {
+    padding: 10px 10px 2px;
+  }
+
+  .ruban:not(.deplie) .ruban-bouton,
+  .ruban:not(.deplie) .ruban-code {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    padding: 4px 2px;
+  }
+
+  .ruban:not(.deplie) .ruban-expr {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    word-break: normal;
+  }
+
+  .ruban:not(.deplie) .ruban-res {
+    flex: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .appareil {
+    padding: 14px 12px;
+  }
+
+  .clavier {
+    gap: 6px;
+  }
+
+  .touche {
+    font-size: 0.72rem;
+  }
+
+  .chiffre {
+    font-size: 1.3rem;
+  }
+
+  .expression {
+    font-size: 2.6rem;
+  }
+
+  .pied-calc {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+@media (max-height: 700px) and (min-width: 761px) {
+  .touche {
+    height: 46px;
+  }
+
+  .ecran {
+    min-height: 112px;
+  }
+}

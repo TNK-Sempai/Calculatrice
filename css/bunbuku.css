@@ -1,0 +1,29 @@
+/* =====================================================================
+   ASTEROIDS (Bunbuku)
+   Espace de 720 x 540 logiques, dimensionne en JS et net a toute
+   resolution. Score, vague, vies et bouclier sont dessines dans le jeu.
+   ===================================================================== */
+
+.jeu-bunbuku {
+  gap: 8px;
+}
+
+.entete-bunbuku {
+  width: min(96vw, 1000px);
+  justify-content: flex-end;
+}
+
+.entete-bunbuku .entete-boutons {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+#canvasBunbuku {
+  display: block;
+  max-width: 96vw;
+  background-color: #0b0a1c;
+  border: 1px solid var(--bord-fort);
+  border-radius: 8px;
+  touch-action: none;
+}

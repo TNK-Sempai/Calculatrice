@@ -1,0 +1,558 @@
+/* =====================================================================
+   BASE - variables, coque commune des jeux et surcouches
+   La facade (calculatrice + ruban) est dans facade.css, le menu arcade
+   et l'ecran titre dans arcade.css. Les jeux lisent les variables
+   ci-dessous : changer la palette ici les rhabille tous.
+   ===================================================================== */
+
+/* ===== Direction artistique, alignee sur le portfolio V2 ===== */
+:root {
+  color-scheme: dark;
+  --fond: #09090e;
+  --fond-profond: #050508;
+  --panneau: #101017;
+  --panneau-clair: #17171f;
+  --bord: #22222c;
+  --bord-fort: #33333f;
+  --texte: #ede8df;
+  --texte-sourd: #8f8a82;
+  --texte-eteint: #55524d;
+  --accent: #c8f060;
+  --accent-sombre: #9fc43f;
+  --accent-voile: rgba(200, 240, 96, 0.1);
+  --vermillon: #c8372d;
+  --papier: #ede8df;
+  --encre: #1a1a20;
+
+  --police-affichage: "Anybody", "Arial Narrow", sans-serif;
+  --police-texte: "Hanken Grotesk", system-ui, sans-serif;
+  --police-mono: "Martian Mono", ui-monospace, "Courier New", monospace;
+  --police-jp: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", serif;
+
+  /* Anybody est variable en largeur : etroite elle remplace Bebas Neue
+     sans changer l'encombrement des en-tetes de jeux */
+  --etroit: 62%;
+  --rayon: 10px;
+  --rayon-petit: 6px;
+  --courbe: cubic-bezier(0.7, 0, 0.2, 1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Sur mobile, une double tape rapide sur un bouton declenche le zoom du
+   navigateur. touch-action: manipulation supprime ce comportement sans
+   interdire le zoom a deux doigts, contrairement a user-scalable=no. */
+button,
+a,
+input,
+.case-solitaire,
+.tuile,
+.case-sudoku,
+.tuile-mahjong {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  background-color: var(--fond);
+}
+
+body {
+  font-family: var(--police-mono);
+  background-color: var(--fond);
+  color: var(--texte);
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background-color: var(--accent);
+  color: var(--fond);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+[lang="ja"] {
+  font-family: var(--police-jp);
+  font-weight: 600;
+}
+
+/* Toute utilisation de la police d'affichage reste etroite */
+.titre,
+.overlay-titre,
+.jeu-score strong,
+.scores-input {
+  font-stretch: var(--etroit);
+}
+
+/* ===== Jeu plein ecran ===== */
+.jeu {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background-color: var(--fond);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Pas de justify-content: center : il coupe le haut du contenu des
+     qu'il deborde. Les marges automatiques ci-dessous centrent quand ca
+     tient, et laissent defiler sinon. Meme correction sur les surcouches. */
+  justify-content: flex-start;
+  gap: 16px;
+  padding: 16px;
+  padding-top: max(16px, env(safe-area-inset-top));
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+  overflow-y: auto;
+  /* Jamais de defilement horizontal : les plateaux font 94vw au plus,
+     les marges laterales ci-dessous completent exactement l'ecran */
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+}
+
+@media (max-width: 560px) {
+  .jeu {
+    padding-left: max(2vw, env(safe-area-inset-left, 0px));
+    padding-right: max(2vw, env(safe-area-inset-right, 0px));
+  }
+}
+
+.jeu > *:first-child {
+  margin-top: auto;
+}
+
+.jeu > *:last-child {
+  margin-bottom: auto;
+}
+
+.jeu[hidden] {
+  display: none;
+}
+
+/* Le jeu apparait au moment ou l'ecran titre s'efface */
+.jeu.entree {
+  animation: entree-jeu 0.28s ease-out;
+}
+
+@keyframes entree-jeu {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.jeu-entete {
+  width: min(90vw, calc(100vh - 160px));
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.jeu-score {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--texte-sourd);
+}
+
+.jeu-score strong {
+  font-family: var(--police-affichage);
+  font-weight: 700;
+  font-size: 2rem;
+  color: var(--accent);
+  margin-left: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.jeu-quitter {
+  font-family: var(--police-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--texte-sourd);
+  background-color: transparent;
+  border: 1px solid var(--bord-fort);
+  border-radius: var(--rayon-petit);
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+}
+
+.jeu-quitter:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.jeu-quitter:active {
+  transform: translateY(1px);
+}
+
+/* Un lien stylise comme un bouton */
+.lien-bouton {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  line-height: 1;
+}
+
+.jeu-aide {
+  font-family: var(--police-texte);
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--texte-sourd);
+  text-align: center;
+  max-width: min(90vw, 720px);
+}
+
+/* ===== Surcouches communes : menu et scores ===== */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background-color: rgba(9, 9, 14, 0.97);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 18px;
+  padding: 24px;
+  padding-top: max(24px, env(safe-area-inset-top));
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.overlay > *:first-child {
+  margin-top: auto;
+}
+
+.overlay > *:last-child {
+  margin-bottom: auto;
+}
+
+.overlay[hidden] {
+  display: none;
+}
+
+.overlay-titre {
+  font-family: var(--police-affichage);
+  font-size: 2.6rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* Deux colonnes de scores : local et en ligne */
+.scores-colonnes {
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.scores-colonne {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.scores-etat {
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  color: var(--texte-sourd);
+  min-height: 1.2em;
+}
+
+/* Tableau des scores */
+.scores-liste {
+  list-style: none;
+  width: min(380px, 90vw);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.scores-liste li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.78rem;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--bord);
+  color: var(--texte-sourd);
+  font-variant-numeric: tabular-nums;
+}
+
+.scores-liste li.recent {
+  color: var(--accent);
+  background-color: var(--accent-voile);
+}
+
+.scores-rang {
+  width: 2.2em;
+  color: var(--texte-eteint);
+}
+
+.scores-nom {
+  flex: 1;
+  letter-spacing: 0.12em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--texte);
+}
+
+.scores-liste li.recent .scores-nom,
+.scores-liste li.recent .scores-rang {
+  color: var(--accent);
+}
+
+.scores-saisie {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.scores-ligne {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.scores-input {
+  width: 8em;
+  font-family: var(--police-affichage);
+  font-weight: 700;
+  font-size: 1.8rem;
+  text-align: center;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background-color: var(--panneau);
+  border: 1px solid var(--accent);
+  border-radius: var(--rayon-petit);
+  padding: 4px 8px;
+}
+
+.scores-input:focus {
+  outline: none;
+  background-color: var(--panneau-clair);
+}
+
+/* Les libelles partages (Hold, Next, Sur cet appareil...) */
+.tetris-label {
+  font-family: var(--police-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--texte-sourd);
+}
+
+@media (max-width: 560px), (max-height: 720px) {
+  .overlay {
+    gap: 12px;
+    padding: 16px 12px;
+  }
+
+  .overlay-titre {
+    font-size: 2rem;
+  }
+
+  .scores-colonnes {
+    gap: 16px;
+  }
+}
+
+/* ===== Classements lateraux =====
+   Deux panneaux colles aux bords de la fenetre, dans le style des
+   panneaux Hold et Next du Tetris. Ils ne servent que sur grand ecran :
+   en dessous de 1100 px ils disparaissent sans toucher au jeu. */
+.panneau-classement {
+  display: none;
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 15;
+  width: 200px;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  background-color: var(--panneau);
+  border: 1px solid var(--bord);
+  border-radius: var(--rayon-petit);
+}
+
+.panneau-classement.panneau-local {
+  left: 20px;
+}
+
+.panneau-classement.panneau-en-ligne {
+  right: 20px;
+}
+
+/* Glisses dans les colonnes d'un jeu qui occupe deja ses cotes */
+.panneau-classement.dans-le-jeu {
+  position: static;
+  transform: none;
+  width: auto;
+  padding: 0;
+  background: none;
+  border: none;
+}
+
+@media (min-width: 1100px) {
+  .panneau-classement.actif {
+    display: flex;
+  }
+}
+
+.classement-liste {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.classement-liste li {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 0.62rem;
+  letter-spacing: 0.02em;
+  color: var(--texte-sourd);
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-variant-numeric: tabular-nums;
+}
+
+.classement-liste .scores-rang {
+  color: var(--texte-eteint);
+}
+
+.classement-liste .scores-nom {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--texte);
+}
+
+/* Une entree que le score courant vient de depasser */
+.classement-liste li.depassee {
+  opacity: 0.35;
+}
+
+/* La ligne provisoire du joueur, a la place qu'il occupe en ce moment */
+.classement-liste li.provisoire {
+  background-color: var(--accent-voile);
+  color: var(--accent);
+}
+
+.classement-liste li.provisoire .scores-nom,
+.classement-liste li.provisoire .scores-rang {
+  color: var(--accent);
+}
+
+/* Une ligne qui ne sert qu'a reserver la hauteur : invisible, mais elle
+   occupe exactement la place d'une vraie. C'est ce qui empeche la page
+   de sauter quand le classement en ligne arrive. */
+.classement-liste li.reserve {
+  visibility: hidden;
+}
+
+/* En mode compact, la ligne du joueur classe au-dela de la cinquieme
+   place, detachee du haut du tableau par un separateur. */
+.classement-liste li.hors-tableau {
+  margin-top: 4px;
+  padding-top: 5px;
+  border-top: 1px solid var(--bord);
+}
+
+.classement-liste li.classement-vide {
+  color: var(--texte-eteint);
+  font-style: italic;
+}
+
+.classement-rang {
+  font-size: 0.6rem;
+  letter-spacing: 0.04em;
+  color: var(--texte-sourd);
+  /* Deux lignes reservees : les textes les plus longs passent a la ligne
+     dans un panneau de 200 px, et la hauteur ne doit pas bouger. */
+  min-height: 2.6em;
+  margin: 0;
+}
+
+/* Premiere place atteinte : le panneau se souligne discretement */
+.panneau-classement.premiere-place {
+  border-color: var(--accent-sombre);
+}
+
+.panneau-classement.premiere-place .classement-rang {
+  color: var(--accent);
+}
+
+/* ===== Score de la partie en cours =====
+   Il sort du lot parmi les autres compteurs de l'en-tete. Le soulignement
+   passe par une ombre portee et la hauteur de ligne est resserree : ni la
+   largeur ni la hauteur de l'en-tete ne bougent. */
+.jeu-score.score-principal .valeur-score {
+  font-size: 2.6rem;
+  line-height: 0.9;
+  margin-left: 4px;
+  box-shadow: 0 3px 0 -1px var(--accent-sombre);
+}
+
+.valeur-score {
+  display: inline-block;
+}
+
+/* Pulsation courte quand le score monte */
+.valeur-score.augmente {
+  animation: pulsation-score 0.28s ease-out;
+}
+
+@keyframes pulsation-score {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.18);
+    color: var(--texte);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

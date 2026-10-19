@@ -1,0 +1,713 @@
+/* =====================================================================
+   KOI-KOI (hanafuda)
+   --l : largeur d'une carte du terrain et de la main, calculee pour que
+   toute la table tienne au-dessus de la manette sur telephone.
+   ===================================================================== */
+
+.jeu-koikoi {
+  gap: 8px;
+}
+
+.entete-koikoi {
+  width: min(94vw, 720px);
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+
+.entete-koikoi .entete-boutons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.table-koikoi {
+  --l: min(calc(min(94vw, 720px) / 8.9), calc((100vh - 320px - var(--hauteur-manette, 0px)) / 7.3), 78px);
+  --l: min(calc(min(94vw, 720px) / 8.9), calc((100dvh - 320px - var(--hauteur-manette, 0px)) / 7.3), 78px);
+  --m: calc(var(--l) * 0.6);
+  position: relative;
+  width: min(94vw, 720px);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--l) * 0.12);
+  padding: calc(var(--l) * 0.12) 0;
+  /* Feutre vert, cadre de bois laque rouge sombre */
+  background: radial-gradient(ellipse at 50% 40%, #24573f 0%, #1b4331 60%, #143424 100%);
+  border: calc(var(--l) * 0.12 + 4px) solid #4a1912;
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 2px #2a0d09, inset 0 0 0 4px rgba(214, 155, 60, 0.35), 0 10px 24px rgba(0, 0, 0, 0.45);
+  outline: 1px solid #6e2a1d;
+  outline-offset: -1px;
+}
+
+/* ---- Cartes ---- */
+
+.carte-koikoi {
+  position: relative;
+  width: var(--l);
+  aspect-ratio: 2 / 3;
+  flex: none;
+  border-radius: 2px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.carte-koikoi img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: calc(var(--l) * 0.06);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.35), 0 3px 8px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+}
+
+.carte-koikoi .carte-mois,
+.carte-koikoi .carte-type {
+  position: absolute;
+  font-family: var(--police-jp);
+  font-weight: 800;
+  line-height: 1;
+  font-size: max(8px, calc(var(--l) * 0.17));
+  padding: 2px 3px;
+  pointer-events: none;
+}
+
+.carte-koikoi .carte-mois {
+  top: 2px;
+  left: 2px;
+  color: #1a1410;
+  background: rgba(241, 232, 210, 0.92);
+  border-radius: 0 0 4px 0;
+  top: 3px;
+  left: 3px;
+}
+
+.carte-koikoi .carte-type {
+  right: 2px;
+  bottom: 2px;
+  color: #faf6ec;
+  border-radius: 4px 0 0 0;
+  right: 3px;
+  bottom: 3px;
+}
+
+.carte-type.type-lumiere { background: #b8861a; }
+.carte-type.type-animal { background: #3d6a3a; }
+.carte-type.type-ruban { background: #a52a22; }
+
+/* Emplacement libre : une empreinte plus sombre sur le feutre */
+.carte-koikoi.vide {
+  background: rgba(0, 0, 0, 0.16);
+  border-radius: calc(var(--l) * 0.06);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+/* ---- Rangees ---- */
+
+.rangee-ia {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 calc(var(--l) * 0.2);
+  box-sizing: border-box;
+}
+
+.main-ia {
+  display: flex;
+}
+
+.main-ia .carte-koikoi,
+.pioche-koikoi .carte-koikoi {
+  width: calc(var(--l) * 0.45);
+}
+
+.main-ia .carte-koikoi + .carte-koikoi {
+  margin-left: calc(var(--l) * -0.22);
+}
+
+.pioche-koikoi {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--police-mono, "Martian Mono", monospace);
+  font-size: 0.75rem;
+  color: var(--texte);
+}
+
+.terrain-koikoi {
+  display: grid;
+  grid-template-columns: repeat(8, var(--l));
+  max-width: 100%;
+  gap: calc(var(--l) * 0.1);
+  min-height: calc(var(--l) * 3.1);
+  align-content: center;
+}
+
+.terrain-koikoi .carte-koikoi:not(.vide) {
+  cursor: pointer;
+}
+
+.main-koikoi {
+  display: flex;
+  justify-content: center;
+  gap: calc(var(--l) * 0.08);
+  min-height: calc(var(--l) * 1.5 + 6px);
+  padding-top: 6px;
+}
+
+.main-koikoi .carte-koikoi {
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+
+/* La carte choisie se souleve ; un trait lime signale celles qui ont
+   un partenaire sur le terrain */
+.main-koikoi.attend .carte-koikoi.choisie {
+  transform: translateY(calc(var(--l) * -0.16));
+}
+
+.main-koikoi.attend .carte-koikoi.choisie img {
+  box-shadow: 0 0 0 2px var(--accent), 0 8px 14px rgba(0, 0, 0, 0.45);
+}
+
+.main-koikoi .carte-koikoi.assortie::after {
+  content: "";
+  position: absolute;
+  left: 15%;
+  right: 15%;
+  bottom: -6px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+
+.terrain-koikoi .carte-koikoi.visee img {
+  box-shadow: 0 0 0 2px #f2b73a, 0 3px 8px rgba(0, 0, 0, 0.35);
+}
+
+.terrain-koikoi .carte-koikoi.curseur {
+  transform: translateY(calc(var(--l) * -0.08));
+}
+
+.terrain-koikoi .carte-koikoi.curseur img {
+  box-shadow: 0 0 0 3px var(--accent), 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+.terrain-koikoi .carte-koikoi.jouee img {
+  box-shadow: 0 0 0 2px #faf6ec, 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* ---- Cartes prises ---- */
+
+.rangee-prises {
+  width: 100%;
+  min-height: calc(var(--m) * 1.5);
+  display: flex;
+  align-items: center;
+  gap: calc(var(--l) * 0.18);
+  padding: 0 calc(var(--l) * 0.2);
+  box-sizing: border-box;
+}
+
+.prises-etiquette {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: calc(var(--l) * 0.9);
+  font-family: var(--police-mono, "Martian Mono", monospace);
+  font-size: 0.68rem;
+  color: var(--texte);
+  line-height: 1.3;
+}
+
+.prises-etiquette strong {
+  font-family: var(--police-affichage, "Anybody", sans-serif);
+  font-size: 0.85rem;
+}
+
+.prises-etiquette em {
+  font-style: normal;
+  color: #1a1410;
+  background: var(--accent);
+  padding: 0 3px;
+}
+
+.prises-groupe {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.prises-groupe .carte-koikoi {
+  width: var(--m);
+}
+
+.prises-groupe .carte-koikoi + .carte-koikoi {
+  margin-left: calc(var(--m) * -0.62);
+}
+
+.prises-groupe .carte-mois,
+.prises-groupe .carte-type {
+  display: none;
+}
+
+.prises-compte {
+  margin-left: 3px;
+  font-family: var(--police-mono, "Martian Mono", monospace);
+  font-size: 0.7rem;
+  color: var(--texte);
+}
+
+/* ---- Panneau de decision et de fin de manche ---- */
+
+.panneau-koikoi {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(9, 9, 14, 0.6);
+  z-index: 7;
+  padding: 12px;
+}
+
+.panneau-koikoi[hidden],
+.aide-yaku[hidden] {
+  display: none;
+}
+
+.panneau-boite {
+  max-width: 420px;
+  background: #f4ead2;
+  border: 3px solid #b8302a;
+  border-radius: 14px;
+  box-shadow: 0 0 0 4px #4a1912, 0 14px 30px rgba(0, 0, 0, 0.5);
+  padding: 18px 20px;
+  text-align: center;
+  font-family: var(--police-texte);
+  color: #2a1a14;
+  animation: koi-apparait 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+.panneau-boite h3 {
+  margin: 0 0 8px;
+  font-family: var(--police-affichage, "Anybody", sans-serif);
+  font-size: 1.5rem;
+  color: #b8302a;
+}
+
+.panneau-boite .jeu-quitter {
+  color: #2a1a14;
+  border-color: #b8302a;
+  background: #fbf3e0;
+}
+
+.panneau-boite .jeu-quitter.active {
+  color: #fbf3e0;
+  background: #b8302a;
+}
+
+@keyframes koi-apparait {
+  from { transform: scale(0.85); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+.panneau-boite p {
+  margin: 0 0 8px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.panneau-boutons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* ---- Aide des yaku ---- */
+
+.aide-yaku {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  overflow-y: auto;
+  background: var(--fond);
+  border: 2px solid #b8302a;
+  border-radius: 10px;
+  padding: 10px 12px;
+  box-sizing: border-box;
+  font-family: var(--police-texte);
+  color: var(--texte);
+  font-size: 0.8rem;
+}
+
+.aide-entete {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.aide-entete h3 {
+  margin: 0;
+  font-family: var(--police-affichage, "Anybody", sans-serif);
+  color: var(--accent);
+}
+
+.aide-yaku table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.aide-yaku th,
+.aide-yaku td {
+  text-align: left;
+  padding: 3px 4px;
+  border-bottom: 1px solid rgba(237, 232, 223, 0.12);
+  vertical-align: top;
+}
+
+.aide-yaku th {
+  font-family: var(--police-mono, "Martian Mono", monospace);
+  font-size: 0.65rem;
+  color: rgba(237, 232, 223, 0.6);
+}
+
+.aide-yaku td small {
+  display: block;
+  font-size: 0.72rem;
+  color: rgba(237, 232, 223, 0.65);
+}
+
+.aide-yaku td:nth-child(3),
+.aide-yaku td:nth-child(4) {
+  font-family: var(--police-mono, "Martian Mono", monospace);
+  white-space: nowrap;
+}
+
+.aide-yaku td.proche {
+  color: var(--accent);
+}
+
+.aide-yaku td.forme {
+  color: #1a1410;
+  background: var(--accent);
+}
+
+.aide-kanji {
+  font-family: var(--police-jp);
+  font-weight: 800;
+  margin-right: 2px;
+}
+
+.aide-note {
+  margin: 8px 0;
+  line-height: 1.4;
+  color: rgba(237, 232, 223, 0.8);
+}
+
+.aide-mois {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 6px 10px;
+}
+
+.aide-colonne span {
+  display: block;
+  font-size: 0.72rem;
+  margin-bottom: 2px;
+}
+
+.aide-colonne div {
+  display: flex;
+  gap: 2px;
+}
+
+.aide-carte {
+  width: 30px;
+  aspect-ratio: 2 / 3;
+  border-radius: 2px;
+  opacity: 0.4;
+}
+
+.aide-carte.prise {
+  opacity: 1;
+}
+
+.jeu-koikoi .jeu-message {
+  font-family: var(--police-texte);
+  font-size: 0.9rem;
+  color: var(--texte);
+  text-align: center;
+  min-height: 1.4em;
+  max-width: min(94vw, 720px);
+  margin: 0;
+}
+
+@media (max-width: 560px) {
+  .entete-koikoi .entete-boutons {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .aide-yaku td:nth-child(2) {
+    font-size: 0.72rem;
+  }
+}
+
+/* ---- Annonce d'un yaku ---- */
+
+.annonce-yaku {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(9, 9, 14, 0.55);
+  pointer-events: none;
+}
+
+.annonce-yaku[hidden] {
+  display: none;
+}
+
+.annonce-boite {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 22px 16px;
+  background: #f4ead2;
+  border: 3px solid #b8302a;
+  border-radius: 16px;
+  box-shadow: 0 0 0 4px #4a1912, 0 16px 34px rgba(0, 0, 0, 0.55);
+  color: #2a1a14;
+  animation: koi-tampon 0.42s cubic-bezier(0.2, 0.9, 0.3, 1.25);
+}
+
+.annonce-boite.ia {
+  border-color: #2a4f9e;
+}
+
+.annonce-qui {
+  font-family: var(--police-mono, "Martian Mono", monospace);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7a5a4a;
+}
+
+.annonce-kanji {
+  font-family: var(--police-jp);
+  font-weight: 800;
+  font-size: calc(var(--l) * 0.9 + 18px);
+  line-height: 1.05;
+  color: #b8302a;
+}
+
+.annonce-boite.ia .annonce-kanji {
+  color: #2a4f9e;
+}
+
+.annonce-nom {
+  font-family: var(--police-affichage, "Anybody", sans-serif);
+  font-weight: 800;
+  font-size: 1.25rem;
+}
+
+.annonce-cartes {
+  display: flex;
+  gap: 4px;
+  margin: 6px 0 2px;
+}
+
+.annonce-cartes img {
+  width: calc(var(--l) * 0.62 + 10px);
+  aspect-ratio: 2 / 3;
+  border-radius: 3px;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.3);
+  animation: koi-carte 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.2) backwards;
+}
+
+.annonce-points {
+  font-family: var(--police-affichage, "Anybody", sans-serif);
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: #b8302a;
+}
+
+@keyframes koi-tampon {
+  0% { transform: scale(1.5) rotate(-4deg); opacity: 0; }
+  60% { transform: scale(0.96) rotate(1deg); opacity: 1; }
+  100% { transform: none; }
+}
+
+@keyframes koi-carte {
+  from { transform: translateY(14px) scale(0.8); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+/* Moins de mouvement si le systeme le demande */
+@media (prefers-reduced-motion: reduce) {
+  .annonce-boite,
+  .annonce-cartes img,
+  .panneau-boite {
+    animation: none;
+  }
+}
+
+/* Sur petit ecran, le choix de la duree se fait discret */
+@media (max-width: 560px) {
+  .jeu-koikoi #dureesKoi .jeu-quitter {
+    padding: 3px 9px;
+    font-size: 0.68rem;
+  }
+}
+
+/* ---- Tutoriel : bulle de papier au-dessus de la table ---- */
+
+.tuto-koikoi {
+  width: min(94vw, 720px);
+  box-sizing: border-box;
+  background: #f4ead2;
+  border: 3px solid #b8302a;
+  border-radius: 14px;
+  padding: 10px 14px 12px;
+  font-family: var(--police-texte);
+  color: #2a1a14;
+  animation: koi-apparait 0.24s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+.tuto-koikoi[hidden] {
+  display: none;
+}
+
+.tuto-tete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.tuto-tete strong {
+  font-family: var(--police-affichage, "Anybody", sans-serif);
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  color: #b8302a;
+}
+
+.tuto-koikoi .jeu-quitter {
+  color: #2a1a14;
+  border-color: #b8302a;
+  background: #fbf3e0;
+}
+
+.tuto-koikoi .jeu-quitter.active {
+  color: #fbf3e0;
+  background: #b8302a;
+}
+
+.tuto-koikoi .tuto-passer {
+  flex: none;
+  font-size: 0.7rem;
+  padding: 4px 8px;
+}
+
+.tuto-koikoi p {
+  margin: 0 0 6px;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.tuto-boutons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.tuto-boutons:empty {
+  display: none;
+}
+
+.tuto-cartes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 2px 0 6px;
+}
+
+.tuto-carte {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.tuto-carte img {
+  width: 34px;
+  aspect-ratio: 2 / 3;
+  border-radius: 2px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.tuto-carte small {
+  font-size: 0.62rem;
+  color: #6a4a3a;
+}
+
+.tuto-yaku {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 8px;
+  margin: 0 12px 4px 0;
+  font-size: 0.8rem;
+}
+
+.tuto-yaku em {
+  color: #b8302a;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.tuto-yaku .tuto-cartes {
+  margin: 0;
+}
+
+.tuto-yaku .tuto-carte img {
+  width: 26px;
+}
+
+.tuto-note {
+  font-size: 0.8rem !important;
+  color: #6a4a3a;
+}
+
+/* La carte a jouer est montree d'un contour qui respire */
+.carte-koikoi.tuto-cible {
+  outline: 3px solid #c6f35a;
+  outline-offset: 2px;
+  border-radius: 3px;
+  animation: koi-tuto 1s ease-in-out infinite alternate;
+}
+
+@keyframes koi-tuto {
+  from { outline-color: #c6f35a; }
+  to { outline-color: rgba(198, 243, 90, 0.35); }
+}
+
+@media (max-width: 560px) {
+  .tuto-koikoi p {
+    font-size: 0.85rem;
+  }
+
+  .tuto-carte img {
+    width: 26px;
+  }
+}

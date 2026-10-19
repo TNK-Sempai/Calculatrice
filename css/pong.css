@@ -1,0 +1,45 @@
+/* =====================================================================
+   PONG (hanetsuki)
+   Terrain en 720 x 440, taille calculee en JS : la largeur suit
+   l'ecran, la hauteur restante au-dessus de la manette peut la limiter.
+   ===================================================================== */
+
+.jeu-hanetsuki {
+  gap: 8px;
+}
+
+/* Score, echange et tour sont dessines dans le bandeau du canvas */
+.entete-hanetsuki .jeu-score {
+  display: none;
+}
+
+.entete-hanetsuki {
+  justify-content: flex-end;
+}
+
+.boutons-hanetsuki {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.modes-hanetsuki .difficulte.active {
+  color: var(--fond);
+  background-color: var(--accent);
+  border-color: var(--accent);
+}
+
+#canvasPong {
+  display: block;
+  max-width: 96vw;
+  background-color: #0b0b10;
+  border: 1px solid var(--bord-fort);
+  border-radius: 10px;
+  touch-action: none;
+}
+
+@media (max-width: 560px) {
+  body.avec-manette .jeu-hanetsuki .jeu-aide {
+    display: none;
+  }
+}

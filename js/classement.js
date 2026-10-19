@@ -5,6 +5,8 @@
 //  Si l'API est absente ou injoignable, le jeu continue sans rien dire.
 // =====================================================================
 
+import { formaterScore } from "./arcade.js";
+
 // Adresse de l'API. Une chaine vide desactive le classement en ligne.
 //   Route PHP  : le dossier api, sans barre oblique finale
 //                "https://serveur-de-l-ecole/tanuki/api"
@@ -12,9 +14,22 @@
 //                "https://script.google.com/macros/s/AKfy.../exec"
 const API_CLASSEMENT = "https://script.google.com/macros/s/AKfycbwPzEKYsPyfv_X-0wVNMHRNXqPfSntE6G10ooctO5Yt4sd8pk2I3eRkhBqWFVqrec1l/exec";
 
-// "php" ou "apps-script". Les deux parlent le meme langage, seules
-// l'adresse des routes et l'en-tete d'envoi changent.
-const TYPE_API = "apps-script";
+// Supabase (schema "arcade" du projet du portfolio). Tant que la cle
+// publique est vide, on reste sur Apps Script. La cle publique (anon ou
+// sb_publishable_...) peut vivre dans le code : la securite est assuree
+// par les regles RLS et la fonction Edge "soumettre-score".
+const SUPABASE = {
+  url: "https://rdmtduvghupgqqwgrsgz.supabase.co",
+  clePublique: "sb_publishable_xErs40HvZEHWYIuw1hHmZw_3xqRfiqx"
+};
+
+// Le Versus en ligne n'existe qu'avec Supabase
+export function configSupabase() {
+  return SUPABASE.clePublique ? SUPABASE : null;
+}
+
+// "supabase", "php" ou "apps-script"
+const TYPE_API = SUPABASE.clePublique ? "supabase" : "apps-script";
 
 // Adresse du formulaire de suggestions. Vide : le bouton n'apparait pas.
 const FORMULAIRE_SUGGESTIONS = "https://docs.google.com/forms/d/e/1FAIpQLSfHVda_NV80NzQLQhvvKFlw5rIvMiPUarLWE4-xth_A424-iw/viewform";
@@ -27,7 +42,7 @@ const zoneEtatEnLigne = document.getElementById("scoresEtatEnLigne");
 
 function classementActif() {
   // Sans les elements d'affichage, on ne tente rien
-  return API_CLASSEMENT !== ""
+  return (TYPE_API === "supabase" || API_CLASSEMENT !== "")
     && typeof fetch === "function"
     && zoneEnLigne !== null
     && zoneListeEnLigne !== null;
@@ -83,9 +98,100 @@ async function appelerApi(adresse, options) {
   }
 }
 
+// ---------------------------------------------------------------------
+// Supabase : connexion anonyme automatique, lecture par fonction SQL,
+// ecriture par la fonction Edge qui verifie chaque score
+// ---------------------------------------------------------------------
+
+const CLE_SESSION = "tanuki-arcade-session";
+
+function lireSession() {
+  try {
+    return JSON.parse(localStorage.getItem(CLE_SESSION) || "null");
+  } catch (erreur) {
+    return null;
+  }
+}
+
+function garderSession(donnees) {
+  if (!donnees || !donnees.access_token) {
+    return null;
+  }
+  const session = {
+    access_token: donnees.access_token,
+    refresh_token: donnees.refresh_token,
+    expire: Date.now() + (Number(donnees.expires_in) || 3600) * 1000 - 60000
+  };
+  try {
+    localStorage.setItem(CLE_SESSION, JSON.stringify(session));
+  } catch (erreur) {
+    // sans stockage, la session vit le temps de la page
+  }
+  return session;
+}
+
+// Jeton du joueur : session existante, rafraichie, ou nouveau compte anonyme
+export async function jetonJoueur() {
+  let session = lireSession();
+  const enTetes = { "Content-Type": "application/json", apikey: SUPABASE.clePublique };
+  if (session && session.expire > Date.now()) {
+    return session.access_token;
+  }
+  if (session && session.refresh_token) {
+    session = garderSession(await appelerApi(SUPABASE.url + "/auth/v1/token?grant_type=refresh_token", {
+      method: "POST", headers: enTetes, body: JSON.stringify({ refresh_token: session.refresh_token })
+    }));
+    if (session) {
+      return session.access_token;
+    }
+  }
+  session = garderSession(await appelerApi(SUPABASE.url + "/auth/v1/signup", {
+    method: "POST", headers: enTetes, body: JSON.stringify({})
+  }));
+  return session ? session.access_token : null;
+}
+
+async function lireScores(id) {
+  if (TYPE_API !== "supabase") {
+    return appelerApi(adresseLecture(id));
+  }
+  const liste = await appelerApi(SUPABASE.url + "/rest/v1/rpc/meilleurs_scores", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Content-Profile": "arcade",
+      apikey: SUPABASE.clePublique,
+    },
+    body: JSON.stringify({ p_jeu: id, p_nombre: 10 })
+  });
+  return Array.isArray(liste) ? { jeu: id, scores: liste } : null;
+}
+
+async function envoyerScoreSupabase(id, nom, score) {
+  const jeton = await jetonJoueur();
+  if (jeton === null) {
+    return null;
+  }
+  return appelerApi(SUPABASE.url + "/functions/v1/soumettre-score", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", apikey: SUPABASE.clePublique, Authorization: "Bearer " + jeton },
+    body: JSON.stringify({ jeu: id, nom, score })
+  });
+}
+
 // Envoi d'un score. Appele par arcade.js apres la saisie du nom.
-async function envoyerScore(id, nom, score) {
+export async function envoyerScore(id, nom, score) {
   if (!classementActif()) {
+    return;
+  }
+  if (TYPE_API === "supabase") {
+    const retour = await envoyerScoreSupabase(id, nom, score);
+    const liste = retour && Array.isArray(retour.scores) ? retour : await lireScores(id);
+    if (liste !== null && Array.isArray(liste.scores)) {
+      remplirListeEnLigne(id, liste.scores, { nom, score });
+    } else {
+      afficherEtatEnLigne("Classement en ligne indisponible");
+    }
     return;
   }
   const corps = JSON.stringify({ jeu: id, nom, score, marqueur: marqueurVisiteur() });
@@ -112,7 +218,7 @@ async function envoyerScore(id, nom, score) {
 
   // Dans tous les cas, on relit le classement : la lecture, elle, passe.
   afficherEtatEnLigne("Mise a jour du classement...");
-  const relecture = await appelerApi(adresseLecture(id));
+  const relecture = await lireScores(id);
 
   if (relecture !== null && Array.isArray(relecture.scores)) {
     remplirListeEnLigne(id, relecture.scores, { nom, score });
@@ -136,8 +242,23 @@ async function envoiSansLecture(corps, enTetes) {
   }
 }
 
+// Lecture brute du classement d'un jeu, sans rien afficher. Les panneaux
+// lateraux s'en servent pour charger la liste une seule fois, a l'ouverture
+// du jeu, et la garder en memoire pendant toute la partie.
+// Renvoie la liste des scores, ou null si le classement est injoignable.
+export async function lireClassementEnLigne(id) {
+  if (!classementActif()) {
+    return null;
+  }
+  const reponse = await lireScores(id);
+  if (reponse === null || !Array.isArray(reponse.scores)) {
+    return null;
+  }
+  return reponse.scores;
+}
+
 // Chargement du classement d'un jeu. Appele a l'ouverture du tableau.
-async function afficherClassementEnLigne(id) {
+export async function afficherClassementEnLigne(id) {
   if (!classementActif()) {
     if (zoneEnLigne !== null) {
       zoneEnLigne.hidden = true;
@@ -148,7 +269,7 @@ async function afficherClassementEnLigne(id) {
   zoneListeEnLigne.innerHTML = "";
   afficherEtatEnLigne("Chargement du classement...");
 
-  const reponse = await appelerApi(adresseLecture(id));
+  const reponse = await lireScores(id);
   if (reponse === null || !Array.isArray(reponse.scores)) {
     afficherEtatEnLigne("Classement en ligne indisponible");
     return;
@@ -205,4 +326,69 @@ if (boutonSuggestion !== null) {
       window.open(FORMULAIRE_SUGGESTIONS, "_blank", "noopener");
     });
   }
+}
+// ---------------------------------------------------------------------
+// Cache du classement en ligne
+// Le menu et l'ecran titre affichent le n°1 mondial de chaque jeu. Pour
+// ne pas interroger le serveur a chaque ouverture, la derniere lecture
+// est gardee quelques minutes sur l'appareil.
+// ---------------------------------------------------------------------
+
+const DUREE_CACHE = 5 * 60 * 1000;
+const enVol = new Map();
+
+function cleCache(id) {
+  return "tanuki-arcade-monde-" + id;
+}
+
+// Lecture immediate, sans reseau : la derniere liste connue, ou null
+export function classementEnCache(id) {
+  try {
+    const brut = localStorage.getItem(cleCache(id));
+    if (brut === null) {
+      return null;
+    }
+    const valeur = JSON.parse(brut);
+    return Array.isArray(valeur.scores) ? valeur : null;
+  } catch (erreur) {
+    return null;
+  }
+}
+
+// Renvoie la liste a jour (depuis le cache s'il est frais), ou null
+export function classementFrais(id) {
+  const cache = classementEnCache(id);
+  if (cache !== null && Date.now() - cache.t < DUREE_CACHE) {
+    return Promise.resolve(cache.scores);
+  }
+  if (enVol.has(id)) {
+    return enVol.get(id);
+  }
+  const promesse = lireClassementEnLigne(id).then(scores => {
+    enVol.delete(id);
+    if (scores === null) {
+      return cache !== null ? cache.scores : null;
+    }
+    try {
+      localStorage.setItem(cleCache(id), JSON.stringify({ t: Date.now(), scores }));
+    } catch (erreur) {
+      // pas de cache possible : on servira la lecture directe
+    }
+    return scores;
+  });
+  enVol.set(id, promesse);
+  return promesse;
+}
+
+// Apres un envoi, le cache ne reflete plus la realite
+export function oublierCache(id) {
+  try {
+    localStorage.removeItem(cleCache(id));
+  } catch (erreur) {
+    // rien a faire
+  }
+}
+
+export function classementEnLigneActif() {
+  return classementActif();
 }

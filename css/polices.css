@@ -1,0 +1,61 @@
+/* =====================================================================
+   POLICES - hebergees dans le projet
+   Plus aucun appel a Google Fonts : la page s'affiche pareil hors ligne
+   (PWA) et sans flash de police de secours.
+   Anybody et Hanken Grotesk sont variables, Shippori Mincho est reduite
+   aux seuls caracteres japonais utilises dans l'interface. Si tu ajoutes
+   un nom japonais, il faudra regenerer ce sous-ensemble (voir README).
+   ===================================================================== */
+
+@font-face {
+  font-family: "Anybody";
+  src: url("../fonts/anybody.woff2") format("woff2-variations"), url("../fonts/anybody.woff2") format("woff2");
+  font-weight: 100 900;
+  font-stretch: 50% 150%;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Les voyelles longues des noms japonais (Ryū, Yōkai) : chargees seulement si affichees */
+@font-face {
+  font-family: "Anybody";
+  src: url("../fonts/anybody-ext.woff2") format("woff2-variations"), url("../fonts/anybody-ext.woff2") format("woff2");
+  font-weight: 100 900;
+  font-stretch: 50% 150%;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1E00-1E9F, U+20A0-20C0, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "Hanken Grotesk";
+  src: url("../fonts/hanken-grotesk.woff2") format("woff2-variations"), url("../fonts/hanken-grotesk.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Martian Mono";
+  src: url("../fonts/martian-mono-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Martian Mono";
+  src: url("../fonts/martian-mono-600.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Shippori Mincho B1";
+  src: url("../fonts/shippori-jp.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}

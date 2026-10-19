@@ -1,0 +1,32 @@
+/* =====================================================================
+   YOKAI INVADERS
+   Le canvas (480 x 720 logiques) est dimensionne en JS, net a toute
+   resolution. Score, vague, vies et koban sont dessines dans le jeu :
+   l'en-tete ne garde que les boutons.
+   ===================================================================== */
+
+.jeu-yokai {
+  gap: 8px;
+}
+
+.entete-yokai {
+  width: min(96vw, 600px);
+  justify-content: flex-end;
+}
+
+.entete-yokai .entete-boutons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+}
+
+#canvasYokai {
+  display: block;
+  max-width: 96vw;
+  background-color: #0c0d26;
+  border: 1px solid var(--bord-fort);
+  border-radius: 10px;
+  touch-action: none;
+  cursor: crosshair;
+}

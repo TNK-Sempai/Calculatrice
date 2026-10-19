@@ -1,0 +1,24 @@
+/* =====================================================================
+   FROGGER (kappa)
+   Le canvas (520 x 610 logiques) est dimensionne en JS pour rester net
+   et tenir au-dessus de la manette. Score, niveau, vies et chrono sont
+   dessines dans le jeu : l'en-tete ne garde que les boutons.
+   ===================================================================== */
+
+.jeu-kappa {
+  gap: 8px;
+}
+
+.entete-kappa {
+  width: min(96vw, 700px);
+  justify-content: flex-end;
+}
+
+#canvasKappa {
+  display: block;
+  max-width: 96vw;
+  border-radius: 10px;
+  border: 1px solid var(--bord-fort);
+  touch-action: none;
+  cursor: pointer;
+}

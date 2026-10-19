@@ -1,0 +1,361 @@
+/* =====================================================================
+   DAMES INTERNATIONALES
+   Le plateau de bois, cadre compris, est dessine dans un canvas rendu a
+   la resolution de l'ecran ; sa taille est calculee en JS. Les reserves
+   l'encadrent. L'historique se range a droite sur grand ecran, dessous
+   sur telephone.
+   ===================================================================== */
+
+.jeu-dames {
+  --cote-dames: 560px;
+  gap: 10px;
+}
+
+.jeu-dames > * {
+  flex-shrink: 0;
+}
+
+.entete-dames {
+  width: min(94vw, 820px);
+  flex-wrap: wrap;
+  gap: 8px 14px;
+}
+
+.entete-boutons-dames {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+}
+
+/* Le bouton d'aide reste allume tant qu'il est actif */
+#aideDames.actif {
+  color: var(--fond);
+  background-color: var(--vermillon);
+  border-color: var(--vermillon);
+}
+
+.dames-zone {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.dames-plateau {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: var(--cote-dames);
+}
+
+#damierDames {
+  display: block;
+  border-radius: 14px;
+  box-shadow: 0 5px 0 #1c1209, 0 9px 0 rgba(0, 0, 0, 0.3);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  cursor: pointer;
+}
+
+#damierDames.reflexion {
+  cursor: wait;
+}
+
+.dames-reserve {
+  display: block;
+}
+
+#reserveBasDames {
+  margin-top: 8px;
+}
+
+/* ---------------------------------------------------------------------
+   Fin de partie et regles : des plaques posees sur le damier
+   --------------------------------------------------------------------- */
+
+.fin-dames,
+.regles-dames {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  color: #2a1d12;
+  background-color: #f4ead4;
+  border: 2px solid #b88a3e;
+  border-radius: 8px;
+  box-shadow: 0 5px 0 #6e4a2c, 0 9px 0 rgba(0, 0, 0, 0.3);
+}
+
+.fin-dames[hidden],
+.regles-dames[hidden] {
+  display: none;
+}
+
+.fin-dames {
+  width: min(84%, 340px);
+  gap: 8px;
+  padding: 20px 18px 16px;
+  animation: dames-plaque 0.3s ease-out both;
+}
+
+.fin-dames strong,
+.regles-dames strong {
+  font-family: var(--police-affichage);
+  font-weight: 800;
+  font-stretch: 85%;
+  font-size: 1.6rem;
+  line-height: 1.1;
+}
+
+.fin-dames[data-issue="gagne"] strong {
+  color: #8a5a10;
+}
+
+.fin-dames[data-issue="perdu"] strong {
+  color: #a8291e;
+}
+
+.fin-dames > span:not(.fin-boutons-dames) {
+  font-family: var(--police-texte);
+  font-size: 0.9rem;
+  color: #5a4632;
+}
+
+/* La plaque de victoire porte une couronne, comme une dame */
+.fin-dames[data-issue="gagne"]::before {
+  content: "";
+  width: 46px;
+  height: 30px;
+  background-color: #d9a93a;
+  clip-path: polygon(0 100%, 0 20%, 25% 55%, 50% 0, 75% 55%, 100% 20%, 100% 100%);
+}
+
+.fin-boutons-dames,
+.regles-boutons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.fin-dames .jeu-quitter,
+.regles-dames .jeu-quitter {
+  color: #2a1d12;
+  border-color: #b9a07a;
+  background-color: #ead9b8;
+}
+
+.fin-dames .jeu-quitter:disabled,
+.regles-dames .jeu-quitter:disabled {
+  opacity: 0.4;
+}
+
+#finRejouerDames,
+#suivantReglesDames {
+  color: #f4ead4;
+  border-color: #6e4a2c;
+  background-color: #6e4a2c;
+}
+
+.regles-dames {
+  width: min(92%, 380px);
+  max-height: 96%;
+  overflow-y: auto;
+  gap: 8px;
+  padding: 16px 16px 14px;
+  animation: dames-plaque 0.25s ease-out both;
+}
+
+.regles-dames strong {
+  font-size: 1.3rem;
+}
+
+.regles-dames p {
+  margin: 0;
+  font-family: var(--police-texte);
+  font-size: 0.86rem;
+  line-height: 1.4;
+  color: #4a3a28;
+}
+
+#toileReglesDames {
+  border: 3px solid #4a2f1b;
+  border-radius: 4px;
+}
+
+.regles-etape {
+  font-family: var(--police-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  color: #8a6c4a;
+}
+
+.regles-fermer {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  width: 30px;
+  height: 30px;
+  font-size: 1.3rem;
+  line-height: 1;
+  color: #6e4a2c;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+@keyframes dames-plaque {
+  from {
+    opacity: 0;
+    margin-top: 14px;
+  }
+  to {
+    opacity: 1;
+    margin-top: 0;
+  }
+}
+
+.dames-historique {
+  width: 170px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-self: stretch;
+}
+
+.dames-coups {
+  list-style: none;
+  max-height: calc(var(--cote-dames) - 20px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  scrollbar-width: thin;
+}
+
+.dames-coups li {
+  display: grid;
+  grid-template-columns: 2.4em 1fr 1fr;
+  gap: 6px;
+  font-size: 0.66rem;
+  padding: 3px 0;
+  border-bottom: 1px solid var(--bord);
+  font-variant-numeric: tabular-nums;
+}
+
+.coup-numero {
+  color: var(--texte-eteint);
+}
+
+.coup-joueur {
+  color: var(--texte);
+}
+
+.coup-ia {
+  color: var(--texte-sourd);
+}
+
+.jeu-dames .jeu-message {
+  min-height: 1.4em;
+  font-family: var(--police-texte);
+  font-size: 0.9rem;
+  color: var(--texte);
+}
+
+/* Sur ecran moyen et telephone, l'historique passe sous le plateau */
+@media (max-width: 860px) {
+  .dames-zone {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .dames-historique {
+    width: var(--cote-dames);
+  }
+
+  .dames-coups {
+    max-height: 4.6em;
+  }
+}
+
+@media (max-width: 560px) {
+  .jeu-dames {
+    gap: 6px;
+  }
+
+  .regles-dames {
+    gap: 5px;
+    padding: 12px 10px 10px;
+  }
+
+  .regles-dames p {
+    font-size: 0.78rem;
+  }
+
+  .entete-dames .jeu-score strong {
+    font-size: 1.5rem;
+  }
+
+  .entete-dames .jeu-score.score-principal .valeur-score {
+    font-size: 1.9rem;
+  }
+
+  .entete-boutons-dames {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .entete-boutons-dames .jeu-quitter {
+    padding: 7px 8px;
+  }
+
+  #damierDames {
+    border-radius: 10px;
+  }
+
+  .jeu-dames .jeu-aide {
+    display: none;
+  }
+
+  .jeu-dames .jeu-message {
+    margin-bottom: auto;
+  }
+}
+
+@media (max-width: 420px) {
+  .entete-dames {
+    gap: 4px 10px;
+  }
+
+  .entete-boutons-dames {
+    gap: 4px;
+  }
+
+  .entete-boutons-dames .jeu-quitter {
+    padding: 5px 6px;
+    font-size: 0.6rem;
+    letter-spacing: 0;
+  }
+
+  .entete-dames .jeu-score strong {
+    font-size: 1.2rem;
+  }
+
+  .entete-dames .jeu-score.score-principal .valeur-score {
+    font-size: 1.5rem;
+  }
+
+  #difficultesDames .jeu-quitter {
+    padding: 5px 7px;
+    font-size: 0.62rem;
+  }
+}
