@@ -3,6 +3,95 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+  <!-- Mesure d'audience. Ce bloc ne charge rien par lui-meme : il pose le
+       Consent Mode v2 a "denied", puis ne va chercher Google Tag Manager
+       que si un accord est deja enregistre. Sans choix, ou apres un refus,
+       aucun script Google ni Meta n'arrive sur la page. Le bandeau est
+       dans js/consentement.js. -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    (function () {
+      var CLE = "tnk-consent";
+      var GTM = "GTM-N4XFZHH2";
+
+      // Le choix est garde dans un cookie pose sur le domaine parent :
+      // c'est ce qui le fait valoir pour le portfolio comme pour
+      // l'arcade. En local, ni Domain ni Secure, le navigateur
+      // refuserait le cookie.
+      var local = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+      var SUFFIXE = local
+        ? "; Path=/; Max-Age=31536000; SameSite=Lax"
+        : "; Domain=.tanuki-corporation.com; Path=/; Max-Age=31536000; SameSite=Lax; Secure";
+
+      function ecrire(valeur) {
+        document.cookie = CLE + "=" + valeur + SUFFIXE;
+      }
+
+      function lire() {
+        var trouve = document.cookie.split(";").map(function (m) {
+          return m.trim();
+        }).filter(function (m) {
+          return m.indexOf(CLE + "=") === 0;
+        })[0];
+        var v = trouve ? trouve.slice(CLE.length + 1) : null;
+        if (v === "granted" || v === "denied") { return v; }
+        // Reprise d'un choix fait avant le passage au cookie : on le
+        // recopie, puis on efface l'ancienne cle.
+        try {
+          var ancien = localStorage.getItem(CLE);
+          if (ancien === "granted" || ancien === "denied") {
+            ecrire(ancien);
+            localStorage.removeItem(CLE);
+            return ancien;
+          }
+        } catch (e) {}
+        return null;
+      }
+
+      var choix = lire();
+
+      function gtag() { window.dataLayer.push(arguments); }
+
+      gtag("consent", "default", {
+        ad_storage: "denied",
+        analytics_storage: "denied",
+        ad_user_data: "denied",
+        ad_personalization: "denied",
+        wait_for_update: 500
+      });
+      if (choix === "granted") {
+        gtag("consent", "update", {
+          ad_storage: "granted",
+          analytics_storage: "granted",
+          ad_user_data: "granted",
+          ad_personalization: "granted"
+        });
+      }
+
+      var deja = false;
+      function chargerGtm() {
+        if (deja) { return; }
+        deja = true;
+        window.dataLayer.push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+        var j = document.createElement("script");
+        j.async = true;
+        j.src = "https://www.googletagmanager.com/gtm.js?id=" + GTM;
+        var f = document.getElementsByTagName("script")[0];
+        f.parentNode.insertBefore(j, f);
+      }
+
+      // Le bandeau s'en sert pour mettre a jour le consentement et
+      // charger le conteneur au moment de l'accord.
+      window.tnkConsentement = {
+        cle: CLE, gtm: GTM, choix: choix,
+        lire: lire, ecrire: ecrire, gtag: gtag, chargerGtm: chargerGtm
+      };
+
+      if (choix === "granted") { chargerGtm(); }
+    })();
+  </script>
+
   <title>Tanuki Calc - calculatrice scientifique</title>
   <meta name="description" content="Une calculatrice scientifique en ligne, gratuite et hors ligne : trigonometrie, logarithmes, factorielles, historique imprime. Certains nombres cachent autre chose.">
   <meta name="theme-color" content="#09090e">
@@ -23,6 +112,7 @@
   <link rel="preload" href="fonts/martian-mono-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="css/polices.css">
   <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/consentement.css?v=1">
   <link rel="stylesheet" href="css/facade.css">
   <link rel="stylesheet" href="css/arcade.css">
   <link rel="stylesheet" href="css/manette.css">
@@ -135,6 +225,7 @@
 
       <footer class="pied-calc">
         <a class="lien-pied" href="https://docs.google.com/forms/d/e/1FAIpQLSfHVda_NV80NzQLQhvvKFlw5rIvMiPUarLWE4-xth_A424-iw/viewform" target="_blank" rel="noopener">Une suggestion ?</a>
+        <button class="lien-pied" id="lienCookies" type="button">Cookies</button>
         <span class="compteur-secrets" id="compteurSecrets" hidden></span>
         <a class="lien-pied cafe" href="https://ko-fi.com/B0B31Z3AVY" target="_blank" rel="noopener">Offrir un caf&eacute;</a>
       </footer>

@@ -17,6 +17,7 @@
 
 import { configSupabase, jetonJoueur } from "./classement.js";
 import { pseudoArcade, memoriserPseudoArcade, ouvrirJeuParId } from "./arcade.js";
+import { mesurer } from "./consentement.js";
 
 const INTERVALLE_ATTENTE = 1500;     // en attente d'un adversaire
 const INTERVALLE_SON_TOUR = 1100;    // l'adversaire reflechit
@@ -26,7 +27,6 @@ const SILENCE_ABANDON = 125000;      // on peut reclamer la victoire
 const CLE_EN_COURS = "tanuki-arcade-versus-";
 
 const sessions = new Map();          // jeu -> session
-
 export function versusDisponible() {
   return configSupabase() !== null && typeof fetch === "function";
 }
@@ -434,6 +434,7 @@ export function creerVersus(config) {
       etat = "jeu";
       memoriserEnCours();
       connus = coups.length;
+      mesurer({ event: "versus_debut", jeu: jeu });
       surDebut({
         monCote,
         jeCommence: p.premier === monCote,
@@ -456,6 +457,7 @@ export function creerVersus(config) {
       etat = "fin";
       memoriserEnCours();
       const resultat = p.gagnant === 0 ? "nul" : p.gagnant === monCote ? "victoire" : "defaite";
+      mesurer({ event: "versus_fin", jeu: jeu, resultat: resultat });
       if (!resultatAnnonce || p.raison === "abandon" || p.raison === "absent" || p.raison === "desaccord") {
         surFin({ resultat, raison: p.raison });
       }

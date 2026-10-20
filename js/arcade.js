@@ -7,6 +7,7 @@
 
 import { dernierResultat, effacerTout } from "./calculatrice.js";
 import { imprimerCode } from "./ruban.js";
+import { mesurer } from "./consentement.js";
 import { afficherManette, masquerManette } from "./noyau/manette.js";
 import { afficherClassementEnLigne, envoyerScore, classementFrais, classementEnCache, oublierCache } from "./classement.js";
 import {
@@ -178,6 +179,11 @@ export function verifierCodeSecret(expression) {
   for (const jeu of jeux) {
     if (correspond(jeu.code)) {
       const nouveau = marquerDecouvert(jeu.id);
+      // Decouvert veut dire trouve pour la premiere fois a la
+      // calculatrice : retaper un code deja connu n'est pas une trouvaille
+      if (nouveau) {
+        mesurer({ event: "code_trouve", jeu: jeu.id });
+      }
       imprimerCode(codeLisible(jeu.code), nomAffiche(jeu), ficheDe(jeu).jp);
       lancerAvecIntro(jeu, ecranCalculatrice.getBoundingClientRect(), jeu.code, nouveau);
       return true;
@@ -496,6 +502,7 @@ function ouvrirJeu(id) {
   calculatrice.hidden = true;
   jeux.forEach(autre => { autre.section.hidden = autre.id !== id; });
   jeuActif = id;
+  mesurer({ event: "jeu_ouvert", jeu: id });
   // Un jeu cache n'a aucun panneau. On ferme avant de le demarrer :
   // ainsi rien de ce qu'il fait a son demarrage ne peut les rouvrir, et
   // la decision ne depend plus de l'ordre des appels.
@@ -870,6 +877,7 @@ export function finDePartie(id, score, titre) {
   jeuAuScore = id;
   scoreEnAttente = score;
   titreAuScore = titre || null;
+  mesurer({ event: "fin_partie", jeu: id, score: score });
   // Le tableau des scores se tape au doigt : la manette s'efface
   masquerManette();
   zoneScores.hidden = false;

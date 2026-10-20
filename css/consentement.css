@@ -1,0 +1,90 @@
+/* =====================================================================
+   BANDEAU DE CONSENTEMENT
+   Aux couleurs de l'arcade, sans flou, sans halo, sans animation
+   decorative. Il se pose au-dessus de la manette au lieu de la cacher :
+   --hauteur-manette vaut 0 quand elle n'est pas la.
+   ===================================================================== */
+
+.bandeau-consentement {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: var(--hauteur-manette, 0px);
+  z-index: 19;
+  background-color: var(--panneau);
+  border-top: 1px solid var(--bord);
+  padding: 16px max(16px, env(safe-area-inset-right, 0px))
+    calc(16px + env(safe-area-inset-bottom, 0px))
+    max(16px, env(safe-area-inset-left, 0px));
+  /* Un texte long ne doit pas pousser le bandeau hors de l'ecran */
+  max-height: 60vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* La manette porte deja sa propre marge basse de securite */
+body.avec-manette .bandeau-consentement {
+  padding-bottom: 16px;
+}
+
+.bandeau-consentement[hidden] {
+  display: none;
+}
+
+.consentement-dedans {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  /* minmax(0, 1fr) et non 1fr : sans cela le texte impose sa largeur et
+     fait apparaitre un defilement horizontal sur telephone */
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px 28px;
+  align-items: center;
+}
+
+.consentement-label {
+  font-family: var(--police-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.consentement-texte {
+  margin: 0;
+  max-width: 72ch;
+  font-family: var(--police-texte);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--texte-sourd);
+  overflow-wrap: break-word;
+}
+
+.consentement-boutons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+}
+
+/* En dessous de 860 px, tout se met en colonne : le bandeau reste bas et
+   ne deborde jamais en largeur. */
+@media (max-width: 860px) {
+  .consentement-dedans {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .consentement-texte {
+    font-size: 0.76rem;
+  }
+}
+
+/* Le lien « Cookies » du pied de page est un bouton : il lui faut les
+   quelques remises a zero que .lien-pied n'a pas, etant prevu pour un
+   lien. */
+button.lien-pied {
+  background-color: transparent;
+  font-size: 0.62rem;
+  cursor: pointer;
+}
