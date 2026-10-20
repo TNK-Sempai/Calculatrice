@@ -3,7 +3,7 @@
 Une calculatrice scientifique en ligne, gratuite et utilisable hors ligne.
 Enfin, presque : certains nombres cachent autre chose.
 
-**En ligne :** https://tnk-sempai.github.io/Calculatrice/
+**En ligne :** https://arcade.tanuki-corporation.com/
 
 ## La calculatrice
 
